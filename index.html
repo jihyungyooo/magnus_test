@@ -199,18 +199,53 @@
         display: block;
       }
 
-      .home-blank {
+      .home-collage {
         min-height: calc(100vh - 44px);
-        border-bottom: 0;
       }
 
-      .home-blank .hero-inner {
+      .home-collage .hero-inner {
+        display: grid;
+        grid-template-columns: 1fr;
         min-height: calc(100vh - 44px);
+        padding: 28px 0;
+        place-items: center;
+      }
+
+      .collage-stage {
+        position: relative;
+        width: min(76vh, 76vw, 760px);
+        aspect-ratio: 1;
+        margin: 0 auto;
+      }
+
+      .collage-piece {
+        position: absolute;
+        left: var(--x);
+        top: var(--y);
+        width: var(--size);
+        aspect-ratio: var(--ratio);
+        border: 0;
+        background: transparent;
         padding: 0;
+        transform: translate(-50%, -50%) rotate(var(--rotate));
+        cursor: pointer;
+        clip-path: var(--clip);
+        overflow: hidden;
       }
 
-      .home-blank .hero-inner > * {
-        display: none;
+      .collage-piece img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: var(--focus);
+        transform: scale(var(--zoom));
+        transition: transform 260ms ease;
+      }
+
+      .collage-piece:hover img,
+      .collage-piece:focus-visible img {
+        transform: scale(calc(var(--zoom) + 0.08));
       }
 
       .hero-inner {
@@ -983,9 +1018,17 @@
           padding: 13px 0;
         }
 
-        .home-blank,
-        .home-blank .hero-inner {
+        .home-collage,
+        .home-collage .hero-inner {
           min-height: calc(100svh - 82px);
+        }
+
+        .home-collage .hero-inner {
+          padding: 24px 0;
+        }
+
+        .collage-stage {
+          width: min(88vw, calc(100svh - 132px), 520px);
         }
 
         .page-title {
@@ -1161,10 +1204,9 @@
         </div>
       </header>
 
-      <section class="page hero home-blank" id="home" data-page="home">
+      <section class="page hero home-collage" id="home" data-page="home">
         <div class="frame hero-inner">
-          <h1 id="artistName">Artist Name</h1>
-          <p class="intro" id="artistStatement"></p>
+          <div class="collage-stage" id="homeCollage" aria-label="Random work collage"></div>
         </div>
       </section>
 
@@ -1739,6 +1781,7 @@
       let activeExhibitionFilter = "All";
       let activeWorkView = "grid";
       let activeExhibitionView = "grid";
+      const homeCollageSeed = Math.floor((Date.now() + Math.random() * 100000) % 4294967295);
 
       function loadData() {
         try {
@@ -1793,8 +1836,6 @@
       function renderSite() {
         document.title = `${data.profile.name} — Artist Homepage`;
         document.querySelector(".brand").textContent = data.profile.name;
-        document.getElementById("artistName").textContent = data.profile.name;
-        document.getElementById("artistStatement").textContent = data.profile.statement;
         document.getElementById("birthInfo").textContent = data.profile.born;
         document.getElementById("bioText").innerHTML = data.profile.bio
           .split("\n")
@@ -1804,6 +1845,7 @@
         document.getElementById("year").textContent = new Date().getFullYear();
         document.getElementById("footerName").textContent = data.profile.name;
         renderFilters();
+        renderHomeCollage();
         renderWorks();
         renderExhibitionList();
         renderEntryList("activityList", data.activities);
@@ -1825,6 +1867,56 @@
         document.querySelectorAll("[data-exhibition-filter]").forEach((button) => {
           button.classList.toggle("selected", button.dataset.exhibitionFilter === activeExhibitionFilter);
         });
+      }
+
+      function seededRandom(seed) {
+        return function random() {
+          seed |= 0;
+          seed = (seed + 0x6d2b79f5) | 0;
+          let value = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+          value = (value + Math.imul(value ^ (value >>> 7), 61 | value)) ^ value;
+          return ((value ^ (value >>> 14)) >>> 0) / 4294967296;
+        };
+      }
+
+      function renderHomeCollage() {
+        const target = document.getElementById("homeCollage");
+        const works = data.works.filter((work) => work.image);
+        if (!target || !works.length) return;
+        const random = seededRandom(homeCollageSeed);
+        const clips = [
+          "polygon(9% 3%, 91% 0%, 99% 76%, 74% 100%, 4% 91%, 0% 22%)",
+          "polygon(18% 0%, 96% 10%, 88% 92%, 26% 100%, 0% 72%, 6% 12%)",
+          "polygon(3% 17%, 66% 0%, 100% 19%, 94% 80%, 31% 100%, 0% 70%)",
+          "polygon(0% 8%, 82% 2%, 100% 52%, 78% 98%, 13% 91%, 4% 42%)",
+          "polygon(22% 2%, 100% 0%, 88% 85%, 48% 100%, 0% 76%, 4% 18%)"
+        ];
+        const count = Math.max(28, Math.min(42, works.length * 2));
+        const shuffled = [...works].sort(() => random() - 0.5);
+        target.innerHTML = Array.from({ length: count }, (_, index) => {
+          const work = shuffled[index % shuffled.length];
+          const angle = (index / count) * Math.PI * 2 + (random() - 0.5) * 0.18;
+          const radius = 37 + random() * 7;
+          const x = 50 + Math.cos(angle) * radius;
+          const y = 50 + Math.sin(angle) * radius;
+          const size = 12 + random() * 8;
+          const ratio = 0.78 + random() * 0.72;
+          const rotate = (random() - 0.5) * 28;
+          const focusX = 18 + random() * 64;
+          const focusY = 18 + random() * 64;
+          const zoom = 1.12 + random() * 0.34;
+          return `
+            <button
+              class="collage-piece"
+              type="button"
+              data-slug="${escapeAttr(itemSlug(work))}"
+              aria-label="${escapeAttr(work.title)}"
+              style="--x:${x.toFixed(2)}%; --y:${y.toFixed(2)}%; --size:${size.toFixed(2)}%; --ratio:${ratio.toFixed(2)}; --rotate:${rotate.toFixed(2)}deg; --focus:${focusX.toFixed(0)}% ${focusY.toFixed(0)}%; --zoom:${zoom.toFixed(2)}; --clip:${clips[index % clips.length]};"
+            >
+              <img src="${escapeAttr(work.image)}" alt="">
+            </button>
+          `;
+        }).join("");
       }
 
       function renderViewOptions() {
@@ -2364,6 +2456,12 @@
         if (!card?.dataset.slug) return;
         event.preventDefault();
         location.hash = `#works/${card.dataset.slug}`;
+      });
+
+      document.getElementById("homeCollage").addEventListener("click", (event) => {
+        const piece = event.target.closest(".collage-piece");
+        if (!piece?.dataset.slug) return;
+        location.hash = `#works/${piece.dataset.slug}`;
       });
 
       document.getElementById("exhibitionFilters").addEventListener("click", (event) => {
