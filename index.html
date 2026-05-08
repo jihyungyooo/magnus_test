@@ -23,6 +23,10 @@
         box-sizing: border-box;
       }
 
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+
       body {
         margin: 0;
         background: var(--bg);
@@ -75,6 +79,7 @@
       .brand {
         font-weight: 560;
         text-decoration: none;
+        min-width: 0;
       }
 
       .nav-center,
@@ -274,6 +279,13 @@
         overflow-x: auto;
         color: #9a9a9a;
         font-weight: 500;
+        min-width: 0;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+
+      .filters::-webkit-scrollbar {
+        display: none;
       }
 
       .filters button {
@@ -356,12 +368,14 @@
         font-size: 15px;
         font-weight: 520;
         line-height: 1.22;
+        overflow-wrap: anywhere;
       }
 
       .index-row span {
         color: #333;
         font-size: 15px;
         line-height: 1.22;
+        overflow-wrap: anywhere;
       }
 
       .index-row .muted {
@@ -789,33 +803,57 @@
         }
 
         .nav {
-          display: flex;
+          display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          grid-template-areas:
+            "brand actions"
+            "links links";
           min-height: auto;
-          padding: 12px 0;
-          align-items: flex-start;
-          justify-content: space-between;
+          gap: 10px 16px;
+          padding: 12px 18px 10px;
+          align-items: center;
+        }
+
+        .brand {
+          grid-area: brand;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
         }
 
         .nav-center {
-          order: 3;
+          grid-area: links;
           width: 100%;
           justify-content: flex-start;
-          gap: 16px;
+          gap: 20px;
           overflow-x: auto;
-          padding-top: 10px;
+          padding: 4px 0 2px;
+          -webkit-overflow-scrolling: touch;
+          scrollbar-width: none;
+        }
+
+        .nav-center::-webkit-scrollbar {
+          display: none;
         }
 
         .nav-right {
-          gap: 14px;
+          grid-area: actions;
+          justify-content: flex-end;
+          gap: 16px;
         }
 
         .section-tools {
           display: grid;
+          grid-template-columns: minmax(0, 1fr) auto;
+          align-items: center;
           gap: 12px;
         }
 
+        .filters {
+          gap: 18px;
+        }
+
         .hero-inner,
-        .section-head,
         .list-item,
         .bio,
         .editor,
@@ -830,13 +868,14 @@
         }
 
         .grid {
-          grid-template-columns: 1fr;
-          gap: 40px;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 38px 28px;
         }
 
         .index-row {
           grid-template-columns: 1fr;
           gap: 6px;
+          padding: 16px 0;
         }
 
         .work-row,
@@ -853,13 +892,21 @@
         }
 
         .exhibition-gallery {
-          grid-template-columns: 1fr;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
         }
 
         .detail-layout,
         .detail-meta,
         .detail-gallery {
           grid-template-columns: 1fr;
+        }
+
+        .detail-layout {
+          gap: 28px;
+        }
+
+        .detail-copy h2 {
+          font-size: clamp(28px, 7vw, 42px);
         }
 
         .studio-shell {
@@ -890,6 +937,199 @@
 
         .form-row {
           grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 560px) {
+        body {
+          font-size: 14px;
+        }
+
+        .frame {
+          padding: 0 16px;
+        }
+
+        .nav {
+          padding: 11px 16px 9px;
+          gap: 9px 12px;
+        }
+
+        .nav a,
+        .nav button {
+          font-size: 14px;
+        }
+
+        .nav-center {
+          gap: 18px;
+        }
+
+        .nav-right {
+          gap: 12px;
+        }
+
+        .search-form {
+          gap: 10px;
+          padding: 12px 0;
+        }
+
+        .search-form input {
+          min-width: 0;
+          font-size: 16px;
+        }
+
+        .search-result {
+          grid-template-columns: 1fr;
+          gap: 4px;
+          padding: 13px 0;
+        }
+
+        .home-blank,
+        .home-blank .hero-inner {
+          min-height: calc(100svh - 82px);
+        }
+
+        .page-title {
+          padding: 30px 0 18px;
+        }
+
+        .page-title h1 {
+          font-size: clamp(30px, 11vw, 44px);
+        }
+
+        .section-head {
+          padding: 18px 0 12px;
+        }
+
+        .section-tools {
+          gap: 10px;
+        }
+
+        .filters {
+          gap: 16px;
+          padding-right: 4px;
+        }
+
+        .view-options button {
+          width: 30px;
+          height: 28px;
+        }
+
+        .grid {
+          grid-template-columns: 1fr;
+          gap: 34px;
+          padding: 22px 0 58px;
+        }
+
+        .work-card h3,
+        .list-item h3 {
+          font-size: 19px;
+        }
+
+        .index-list {
+          padding: 10px 0 58px;
+        }
+
+        .index-row strong,
+        .index-row span {
+          font-size: 14px;
+          line-height: 1.28;
+        }
+
+        .list {
+          padding: 10px 0 58px;
+        }
+
+        .list-item {
+          gap: 14px;
+          padding: 18px 0;
+        }
+
+        .poster {
+          max-width: 220px;
+        }
+
+        .exhibition-gallery,
+        .detail-gallery {
+          grid-template-columns: 1fr;
+        }
+
+        .detail {
+          padding: 18px 0 60px;
+        }
+
+        .detail-back {
+          margin-bottom: 18px;
+        }
+
+        .detail-copy h2 {
+          font-size: clamp(28px, 10vw, 38px);
+        }
+
+        .detail-meta {
+          gap: 14px;
+          margin: 22px 0;
+          padding: 14px 0;
+        }
+
+        .detail-text,
+        .bio p {
+          font-size: 15px;
+        }
+
+        .bio {
+          gap: 14px;
+          padding: 24px 0 58px;
+        }
+
+        .side {
+          padding: 18px 16px;
+        }
+
+        .side h2 {
+          margin-bottom: 14px;
+        }
+
+        .side button,
+        .side a {
+          display: inline-block;
+          width: auto;
+          margin: 0 14px 0 0;
+          padding: 8px 0;
+        }
+
+        .panel {
+          padding: 20px 16px 56px;
+        }
+
+        .panel-head h1 {
+          font-size: 26px;
+        }
+
+        .editor {
+          gap: 18px;
+        }
+      }
+
+      @media (max-width: 380px) {
+        .frame {
+          padding: 0 14px;
+        }
+
+        .nav {
+          padding-left: 14px;
+          padding-right: 14px;
+        }
+
+        .nav-center {
+          gap: 14px;
+        }
+
+        .nav-right {
+          gap: 10px;
+        }
+
+        .filters {
+          gap: 14px;
         }
       }
     </style>
