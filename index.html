@@ -799,6 +799,122 @@
         padding-top: 24px;
       }
 
+      .admin-table-wrap {
+        overflow-x: auto;
+        padding-top: 18px;
+      }
+
+      .admin-table {
+        width: 100%;
+        min-width: 760px;
+        border-collapse: collapse;
+        table-layout: fixed;
+      }
+
+      .admin-table th,
+      .admin-table td {
+        border-bottom: 1px solid var(--line);
+        padding: 13px 12px;
+        text-align: left;
+        vertical-align: top;
+        font-size: 14px;
+        font-weight: 420;
+      }
+
+      .admin-table th {
+        color: #777;
+        font-weight: 560;
+      }
+
+      .admin-table tbody tr {
+        cursor: pointer;
+      }
+
+      .admin-table tbody tr:hover {
+        background: #fafafa;
+      }
+
+      .admin-table .title-cell {
+        font-family: var(--display-font);
+        font-size: 15px;
+        font-weight: 520;
+      }
+
+      .row-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+      }
+
+      .text-btn {
+        border: 0;
+        background: transparent;
+        padding: 0;
+        color: #777;
+        cursor: pointer;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+
+      .text-btn:hover {
+        color: var(--fg);
+      }
+
+      .admin-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 30;
+        display: grid;
+        place-items: center;
+        padding: 28px;
+        background: rgba(255, 255, 255, 0.68);
+        backdrop-filter: blur(8px);
+      }
+
+      .admin-modal[hidden] {
+        display: none;
+      }
+
+      .modal-card {
+        width: min(920px, 100%);
+        max-height: min(86vh, 900px);
+        overflow: auto;
+        background: #fff;
+        border: 1px solid var(--line);
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.12);
+      }
+
+      .modal-head {
+        position: sticky;
+        top: 0;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 18px 20px;
+        background: #fff;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .modal-head h2 {
+        margin: 0;
+        font-family: var(--display-font);
+        font-size: 24px;
+        font-weight: 520;
+      }
+
+      .modal-body {
+        padding: 20px;
+      }
+
+      .modal-footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        padding-top: 8px;
+      }
+
       .records {
         border-right: 1px solid var(--line);
         padding-right: 28px;
@@ -1150,6 +1266,10 @@
           display: grid;
         }
 
+        .admin-table {
+          min-width: 680px;
+        }
+
         .studio-top {
           position: static;
           padding: 18px 18px 0;
@@ -1337,6 +1457,28 @@
 
         .editor {
           gap: 18px;
+        }
+
+        .admin-modal {
+          place-items: stretch;
+          padding: 0;
+          background: #fff;
+        }
+
+        .modal-card {
+          width: 100%;
+          max-height: none;
+          min-height: 100svh;
+          border: 0;
+          box-shadow: none;
+        }
+
+        .modal-body {
+          padding: 16px;
+        }
+
+        .modal-footer {
+          display: grid;
         }
 
         .linked-work {
@@ -1995,7 +2137,7 @@
 
       let data = loadData();
       let adminTab = "profile";
-      let selected = { works: data.works[0]?.id, exhibitions: data.exhibitions[0]?.id };
+      let selected = { works: "", exhibitions: "" };
       let activeWorkCategory = "All";
       let activeExhibitionFilter = "All";
       let activeWorkView = "grid";
@@ -2501,7 +2643,7 @@
         document.getElementById("resetData").addEventListener("click", () => {
           if (!confirm("샘플 데이터로 되돌릴까요? 업로드한 이미지와 수정 내용이 사라집니다.")) return;
           data = hydrateMediaData(structuredClone(initialData));
-          selected = { works: data.works[0]?.id, exhibitions: data.exhibitions[0]?.id };
+          selected = { works: "", exhibitions: "" };
           saveData("Sample content restored.");
           renderAdmin();
         });
@@ -2510,42 +2652,22 @@
       function renderCollectionAdmin(collection, blankFactory) {
         const items = data[collection];
         if (!selected[collection] || !items.some((item) => item.id === selected[collection])) {
-          selected[collection] = items[0]?.id;
+          selected[collection] = "";
         }
         const current = items.find((item) => item.id === selected[collection]);
         document.getElementById("panelActions").innerHTML = `
           <button class="btn" type="button" id="newRecord">New</button>
-          <button class="btn danger" type="button" id="deleteRecord">Delete</button>
         `;
         document.getElementById("adminPanel").innerHTML = `
-          <div class="editor">
-            <div class="records">
-              ${items
-                .map(
-                  (item) => `
-                    <article class="record ${item.id === selected[collection] ? "current" : ""}">
-                      <button class="record-main" type="button" data-id="${item.id}">
-                        <strong>${escapeHtml(item.title)}</strong>
-                        <span>${escapeHtml(item.date || item.year || item.type || "")}</span>
-                        <span class="record-meta">
-                          <span class="status-pill ${item.visible !== false ? "live" : ""}">${item.visible !== false ? "Visible" : "Hidden"}</span>
-                          <span>${collection === "exhibitions" ? `${item.workIds?.length || 0} works` : item.category || ""}</span>
-                        </span>
-                      </button>
-                      <button class="visibility-toggle" type="button" data-visibility-id="${item.id}" data-collection="${collection}">
-                        ${item.visible !== false ? "Hide from site" : "Show on site"}
-                      </button>
-                    </article>
-                  `
-                )
-                .join("") || `<p class="note">아직 등록된 항목이 없습니다.</p>`}
-            </div>
-            <div>${current ? renderForm(collection, current) : `<p class="note">New 버튼으로 첫 항목을 등록하세요.</p>`}</div>
+          <div class="admin-table-wrap">
+            ${items.length ? renderAdminTable(collection, items) : `<p class="note">아직 등록된 항목이 없습니다. New로 첫 항목을 등록하세요.</p>`}
           </div>
+          ${current ? renderAdminModal(collection, current) : `<div class="admin-modal" hidden></div>`}
         `;
-        document.querySelectorAll(".record-main").forEach((button) => {
-          button.addEventListener("click", () => {
-            selected[collection] = button.dataset.id;
+        document.querySelectorAll("[data-edit-id]").forEach((row) => {
+          row.addEventListener("click", (event) => {
+            if (event.target.closest("button, a, input")) return;
+            selected[collection] = row.dataset.editId;
             renderAdmin();
           });
         });
@@ -2558,18 +2680,16 @@
             renderAdmin();
           });
         });
+        document.querySelectorAll("[data-row-delete-id]").forEach((button) => {
+          button.addEventListener("click", () => {
+            deleteItem(collection, button.dataset.rowDeleteId);
+          });
+        });
         document.getElementById("newRecord").addEventListener("click", () => {
           const item = blankFactory();
           data[collection].unshift(item);
           selected[collection] = item.id;
           saveData(`${tabTitle(collection)} item created.`);
-          renderAdmin();
-        });
-        document.getElementById("deleteRecord").addEventListener("click", () => {
-          if (!current || !confirm("이 항목을 삭제할까요?")) return;
-          data[collection] = data[collection].filter((item) => item.id !== current.id);
-          selected[collection] = data[collection][0]?.id;
-          saveData(`${tabTitle(collection)} item deleted.`);
           renderAdmin();
         });
         const form = document.getElementById("recordForm");
@@ -2583,7 +2703,15 @@
             const index = data[collection].findIndex((item) => item.id === current.id);
             data[collection][index] = { ...current, ...values };
             saveData(`${tabTitle(collection)} item saved and reflected.`);
+            selected[collection] = "";
             renderAdmin();
+          });
+          document.getElementById("closeRecord")?.addEventListener("click", () => {
+            selected[collection] = "";
+            renderAdmin();
+          });
+          document.getElementById("deleteCurrent")?.addEventListener("click", () => {
+            deleteItem(collection, current.id);
           });
           const imageInput = document.getElementById("imageInput");
           if (imageInput) {
@@ -2594,6 +2722,7 @@
               const index = data[collection].findIndex((item) => item.id === current.id);
               data[collection][index] = { ...current, image };
               saveData("Image uploaded and reflected.");
+              selected[collection] = current.id;
               renderAdmin();
             });
             const clear = document.getElementById("clearImage");
@@ -2601,6 +2730,7 @@
               const index = data[collection].findIndex((item) => item.id === current.id);
               data[collection][index] = { ...current, image: "" };
               saveData("Image removed.");
+              selected[collection] = current.id;
               renderAdmin();
             });
           }
@@ -2613,10 +2743,118 @@
               const index = data[collection].findIndex((item) => item.id === current.id);
               data[collection][index] = { ...current, poster };
               saveData("Poster uploaded and reflected.");
+              selected[collection] = current.id;
               renderAdmin();
             });
           }
         }
+      }
+
+      function renderAdminTable(collection, items) {
+        if (collection === "works") {
+          return `
+            <table class="admin-table">
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Year</th>
+                  <th>Type</th>
+                  <th>Medium</th>
+                  <th>Status</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                ${items.map((item) => renderAdminRow(collection, item)).join("")}
+              </tbody>
+            </table>
+          `;
+        }
+        return `
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Title</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Linked Works</th>
+                <th>Status</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              ${items.map((item) => renderAdminRow(collection, item)).join("")}
+            </tbody>
+          </table>
+        `;
+      }
+
+      function renderAdminRow(collection, item) {
+        const status = `<span class="status-pill ${item.visible !== false ? "live" : ""}">${item.visible !== false ? "Visible" : "Hidden"}</span>`;
+        const commonActions = `
+          <div class="row-actions">
+            <button class="text-btn" type="button" data-visibility-id="${escapeAttr(item.id)}" data-collection="${collection}">
+              ${item.visible !== false ? "Hide" : "Show"}
+            </button>
+            <button class="text-btn" type="button" data-row-delete-id="${escapeAttr(item.id)}">Delete</button>
+          </div>
+        `;
+        if (collection === "works") {
+          return `
+            <tr data-edit-id="${escapeAttr(item.id)}">
+              <td class="title-cell">${escapeHtml(item.title)}</td>
+              <td>${escapeHtml(item.year)}</td>
+              <td>${escapeHtml(item.category)}</td>
+              <td>${escapeHtml(item.medium)}</td>
+              <td>${status}</td>
+              <td>${commonActions}</td>
+            </tr>
+          `;
+        }
+        return `
+          <tr data-edit-id="${escapeAttr(item.id)}">
+            <td class="title-cell">${escapeHtml(item.title)}</td>
+            <td>${escapeHtml(item.date)}</td>
+            <td>${escapeHtml(item.type)}</td>
+            <td>${escapeHtml(String(item.workIds?.length || 0))}</td>
+            <td>${status}</td>
+            <td>${commonActions}</td>
+          </tr>
+        `;
+      }
+
+      function renderAdminModal(collection, item) {
+        return `
+          <div class="admin-modal" role="dialog" aria-modal="true" aria-label="${escapeAttr(item.title)}">
+            <div class="modal-card">
+              <div class="modal-head">
+                <h2>${escapeHtml(collection === "works" ? "Edit Work" : "Edit Exhibition")}</h2>
+                <button class="icon-btn" type="button" id="closeRecord" aria-label="Close" title="Close">
+                  <svg class="view-icon" viewBox="0 0 16 16" aria-hidden="true">
+                    <path d="M4 4l8 8"></path>
+                    <path d="M12 4l-8 8"></path>
+                  </svg>
+                </button>
+              </div>
+              <div class="modal-body">${renderForm(collection, item)}</div>
+            </div>
+          </div>
+        `;
+      }
+
+      function deleteItem(collection, id) {
+        const item = data[collection].find((entry) => entry.id === id);
+        if (!item || !confirm("이 항목을 삭제할까요?")) return;
+        data[collection] = data[collection].filter((entry) => entry.id !== id);
+        if (collection === "works") {
+          data.exhibitions = data.exhibitions.map((entry) => ({
+            ...entry,
+            workIds: (entry.workIds || []).filter((workId) => workId !== id)
+          }));
+        }
+        selected[collection] = "";
+        saveData(`${tabTitle(collection)} item deleted.`);
+        renderAdmin();
       }
 
       function renderForm(collection, item) {
@@ -2635,7 +2873,10 @@
               <label>Medium<input name="medium" value="${escapeAttr(item.medium)}"></label>
               <label>Dimensions<input name="dimensions" value="${escapeAttr(item.dimensions)}"></label>
               <label>Description<textarea name="description">${escapeHtml(item.description)}</textarea></label>
-              <button class="btn" type="submit">Save Work</button>
+              <div class="modal-footer">
+                <button class="btn danger" type="button" id="deleteCurrent">Delete</button>
+                <button class="btn" type="submit">Save Work</button>
+              </div>
             </form>
           `;
         }
@@ -2666,7 +2907,10 @@
                   .join("") || `<span class="note">No works registered.</span>`}
               </div>
             </label>
-            <button class="btn" type="submit">Save Exhibition</button>
+            <div class="modal-footer">
+              <button class="btn danger" type="button" id="deleteCurrent">Delete</button>
+              <button class="btn" type="submit">Save Exhibition</button>
+            </div>
           </form>
         `;
       }
