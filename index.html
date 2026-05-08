@@ -558,6 +558,48 @@
         height: auto;
       }
 
+      .media-carousel {
+        display: grid;
+        gap: 10px;
+      }
+
+      .carousel-frame {
+        position: relative;
+        overflow: hidden;
+      }
+
+      .carousel-track {
+        display: flex;
+        transition: transform 220ms ease;
+      }
+
+      .carousel-slide {
+        flex: 0 0 100%;
+      }
+
+      .carousel-slide img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .carousel-controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        color: #777;
+        font-size: 13px;
+      }
+
+      .carousel-controls button {
+        border: 0;
+        background: transparent;
+        padding: 0;
+        color: inherit;
+        cursor: pointer;
+      }
+
       .detail-copy h2 {
         margin: 0;
         font-family: var(--display-font);
@@ -792,6 +834,13 @@
         color: #555;
       }
 
+      .btn:disabled {
+        border-color: #cfcfcf;
+        background: #f4f4f4;
+        color: #999;
+        cursor: default;
+      }
+
       .editor {
         display: grid;
         grid-template-columns: minmax(260px, 0.82fr) minmax(360px, 1.18fr);
@@ -876,17 +925,17 @@
       }
 
       .modal-card {
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr);
         width: min(920px, 100%);
         max-height: min(86vh, 900px);
-        overflow: auto;
+        overflow: hidden;
         background: #fff;
         border: 1px solid var(--line);
         box-shadow: 0 24px 80px rgba(0, 0, 0, 0.12);
       }
 
       .modal-head {
-        position: sticky;
-        top: 0;
         z-index: 1;
         display: flex;
         align-items: center;
@@ -905,14 +954,21 @@
       }
 
       .modal-body {
+        overflow: auto;
         padding: 20px;
       }
 
       .modal-footer {
+        position: sticky;
+        bottom: 0;
+        z-index: 1;
         display: flex;
         justify-content: space-between;
         gap: 12px;
-        padding-top: 8px;
+        margin: 18px -20px -20px;
+        padding: 14px 20px;
+        border-top: 1px solid var(--line);
+        background: #fff;
       }
 
       .records {
@@ -1002,6 +1058,132 @@
         color: #333;
         font-size: 14px;
         font-weight: 520;
+      }
+
+      .toggle-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #333;
+        font-size: 14px;
+        font-weight: 520;
+      }
+
+      .toggle-row input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+      }
+
+      .toggle-track {
+        position: relative;
+        width: 42px;
+        height: 24px;
+        border: 1px solid #aaa;
+        border-radius: 999px;
+        background: #f2f2f2;
+        transition: background 160ms ease, border-color 160ms ease;
+      }
+
+      .toggle-track::after {
+        content: "";
+        position: absolute;
+        top: 3px;
+        left: 3px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        background: #777;
+        transition: transform 160ms ease, background 160ms ease;
+      }
+
+      .toggle-row input:checked + .toggle-track {
+        border-color: var(--fg);
+        background: var(--fg);
+      }
+
+      .toggle-row input:checked + .toggle-track::after {
+        transform: translateX(18px);
+        background: #fff;
+      }
+
+      .field-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .char-count {
+        color: #999;
+        font-weight: 420;
+      }
+
+      .media-manager {
+        display: grid;
+        gap: 12px;
+      }
+
+      .media-toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+
+      .file-input {
+        position: absolute;
+        inline-size: 1px;
+        block-size: 1px;
+        opacity: 0;
+        overflow: hidden;
+      }
+
+      .upload-btn {
+        display: inline-flex;
+        align-items: center;
+        min-height: 36px;
+        border: 1px solid var(--fg);
+        border-radius: 4px;
+        padding: 7px 11px;
+        cursor: pointer;
+      }
+
+      .media-grid {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 8px;
+      }
+
+      .media-thumb {
+        position: relative;
+        aspect-ratio: 1;
+        border: 1px solid var(--line);
+        background: #fafafa;
+        overflow: hidden;
+      }
+
+      .media-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .media-remove {
+        position: absolute;
+        top: 6px;
+        right: 6px;
+        width: 24px;
+        height: 24px;
+        border: 1px solid var(--line);
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.92);
+        opacity: 0;
+        cursor: pointer;
+      }
+
+      .media-thumb:hover .media-remove,
+      .media-remove:focus-visible {
+        opacity: 1;
       }
 
       .switch-row input,
@@ -1479,6 +1661,13 @@
 
         .modal-footer {
           display: grid;
+          margin-left: -16px;
+          margin-right: -16px;
+          margin-bottom: -16px;
+        }
+
+        .media-grid {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
         }
 
         .linked-work {
@@ -1693,6 +1882,7 @@
       const storeKey = "artist-homepage-content-v7";
       const studioSessionKey = "artist-studio-session";
       const studioCredentials = { id: "artist", password: "studio2026" };
+      const maxImagesPerItem = 30;
       const emptyImage = "";
       const uid = () =>
         globalThis.crypto?.randomUUID?.() || `item-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -2156,8 +2346,8 @@
 
       function hydrateMediaData(content) {
         content.works = content.works.map((work) => {
-          const images = workImageSets[work.title] || work.images || (work.image ? [work.image] : []);
-          return { ...work, visible: work.visible !== false, image: work.image || images[0] || "", images };
+          const images = uniqueImages(work.images || workImageSets[work.title] || (work.image ? [work.image] : []));
+          return { ...work, visible: work.visible !== false, image: work.image || images[0] || "", images: images.slice(0, maxImagesPerItem) };
         });
         content.exhibitions = content.exhibitions.map((entry) => {
           const media = exhibitionImageSets[entry.title];
@@ -2168,12 +2358,17 @@
           const next = {
             ...entry,
             visible: entry.visible !== false,
-            workIds: Array.isArray(entry.workIds) ? entry.workIds : inferredWorkIds
+            workIds: Array.isArray(entry.workIds) ? entry.workIds : inferredWorkIds,
+            images: uniqueImages(entry.images || []).slice(0, maxImagesPerItem)
           };
           if (!media) return next;
-          return { ...next, poster: media.poster || entry.poster, images: media.images };
+          return { ...next, poster: media.poster || entry.poster, images: uniqueImages(entry.images || media.images || []).slice(0, maxImagesPerItem) };
         });
         return content;
+      }
+
+      function uniqueImages(images = []) {
+        return [...new Set(images.filter(Boolean))];
       }
 
       function publicWorks() {
@@ -2369,11 +2564,12 @@
       }
 
       function renderWorkDetail(work) {
+        const images = uniqueImages(work.images?.length ? work.images : [work.image]);
         return `
           <button class="detail-back" type="button" data-back-to="works">← Works</button>
           <article class="detail-layout">
             <div class="detail-media">
-              ${work.image ? `<img src="${escapeAttr(work.image)}" alt="${escapeAttr(work.title)}">` : ""}
+              ${renderMediaCarousel(images, work.title)}
             </div>
             <div class="detail-copy">
               <p class="kicker">${escapeHtml([work.category, work.year].filter(Boolean).join(" · "))}</p>
@@ -2383,16 +2579,35 @@
                 <div><span>Dimensions</span>${escapeHtml(work.dimensions)}</div>
               </div>
               <p class="detail-text">${escapeHtml(work.description)}</p>
-              ${
-                work.images?.length > 1
-                  ? `<div class="detail-gallery work-gallery">${work.images
-                      .slice(1)
-                      .map((image) => `<img src="${escapeAttr(image)}" alt="${escapeAttr(work.title)} detail view">`)
-                      .join("")}</div>`
-                  : ""
-              }
             </div>
           </article>
+        `;
+      }
+
+      function renderMediaCarousel(images, title) {
+        if (!images.length) return "";
+        if (images.length === 1) return `<img src="${escapeAttr(images[0])}" alt="${escapeAttr(title)}">`;
+        return `
+          <div class="media-carousel" data-carousel data-current="0">
+            <div class="carousel-frame">
+              <div class="carousel-track" style="transform: translateX(0%);">
+                ${images
+                  .map(
+                    (image, index) => `
+                      <div class="carousel-slide">
+                        <img src="${escapeAttr(image)}" alt="${escapeAttr(title)} image ${index + 1}">
+                      </div>
+                    `
+                  )
+                  .join("")}
+              </div>
+            </div>
+            <div class="carousel-controls">
+              <button type="button" data-carousel-prev>Prev</button>
+              <span data-carousel-count>1 / ${images.length}</span>
+              <button type="button" data-carousel-next>Next</button>
+            </div>
+          </div>
         `;
       }
 
@@ -2468,11 +2683,12 @@
       }
 
       function renderExhibitionDetail(entry) {
+        const images = uniqueImages([entry.poster, ...(entry.images || [])]);
         return `
           <button class="detail-back" type="button" data-back-to="exhibitions">← Exhibitions</button>
           <article class="detail-layout">
             <div class="detail-media">
-              ${entry.poster ? `<img src="${escapeAttr(entry.poster)}" alt="${escapeAttr(entry.title)} poster">` : ""}
+              ${renderMediaCarousel(images, `${entry.title} poster`)}
             </div>
             <div class="detail-copy">
               <p class="kicker">${escapeHtml(entry.type)}</p>
@@ -2483,13 +2699,6 @@
                 ${entry.address ? `<div><span>Address</span>${escapeHtml(entry.address)}</div>` : ""}
               </div>
               <p class="detail-text">${escapeHtml(entry.description)}</p>
-              ${
-                entry.images?.length
-                  ? `<div class="detail-gallery">${entry.images
-                      .map((image) => `<img src="${escapeAttr(image)}" alt="${escapeAttr(entry.title)} installation view">`)
-                      .join("")}</div>`
-                  : ""
-              }
               ${renderLinkedWorks(entry)}
               ${entry.link ? `<a class="source-link" href="${escapeAttr(entry.link)}" target="_blank" rel="noreferrer">Original exhibition page</a>` : ""}
             </div>
@@ -2694,6 +2903,7 @@
         });
         const form = document.getElementById("recordForm");
         if (form) {
+          setupFormState(form);
           form.addEventListener("submit", (event) => {
             event.preventDefault();
             const formData = new FormData(event.currentTarget);
@@ -2701,7 +2911,9 @@
             values.visible = formData.get("visible") === "on";
             if (collection === "exhibitions") values.workIds = formData.getAll("workIds");
             const index = data[collection].findIndex((item) => item.id === current.id);
-            data[collection][index] = { ...current, ...values };
+            const next = { ...current, ...values };
+            if (collection === "works") next.image = next.images?.[0] || "";
+            data[collection][index] = next;
             saveData(`${tabTitle(collection)} item saved and reflected.`);
             selected[collection] = "";
             renderAdmin();
@@ -2713,27 +2925,31 @@
           document.getElementById("deleteCurrent")?.addEventListener("click", () => {
             deleteItem(collection, current.id);
           });
-          const imageInput = document.getElementById("imageInput");
-          if (imageInput) {
-            imageInput.addEventListener("change", async (event) => {
-              const file = event.target.files[0];
-              if (!file) return;
-              const image = await fileToDataUrl(file);
+          const imagesInput = document.getElementById("imagesInput");
+          imagesInput?.addEventListener("change", async (event) => {
+            const files = [...event.target.files].slice(0, maxImagesPerItem);
+            if (!files.length) return;
+            const index = data[collection].findIndex((item) => item.id === current.id);
+            const item = data[collection][index];
+            const existing = getItemImages(collection, item);
+            const available = maxImagesPerItem - existing.length;
+            const nextImages = [...existing, ...(await Promise.all(files.slice(0, available).map(fileToDataUrl)))];
+            data[collection][index] = setItemImages(collection, item, nextImages);
+            saveData(`${Math.min(files.length, available)} image(s) uploaded.`);
+            selected[collection] = current.id;
+            renderAdmin();
+          });
+          document.querySelectorAll("[data-remove-image-index]").forEach((button) => {
+            button.addEventListener("click", () => {
               const index = data[collection].findIndex((item) => item.id === current.id);
-              data[collection][index] = { ...current, image };
-              saveData("Image uploaded and reflected.");
-              selected[collection] = current.id;
-              renderAdmin();
-            });
-            const clear = document.getElementById("clearImage");
-            clear.addEventListener("click", () => {
-              const index = data[collection].findIndex((item) => item.id === current.id);
-              data[collection][index] = { ...current, image: "" };
+              const item = data[collection][index];
+              const nextImages = getItemImages(collection, item).filter((_, imageIndex) => imageIndex !== Number(button.dataset.removeImageIndex));
+              data[collection][index] = setItemImages(collection, item, nextImages);
               saveData("Image removed.");
               selected[collection] = current.id;
               renderAdmin();
             });
-          }
+          });
           const posterInput = document.getElementById("posterInput");
           if (posterInput) {
             posterInput.addEventListener("change", async (event) => {
@@ -2748,6 +2964,49 @@
             });
           }
         }
+      }
+
+      function getItemImages(collection, item) {
+        return uniqueImages(item.images || (collection === "works" && item.image ? [item.image] : [])).slice(0, maxImagesPerItem);
+      }
+
+      function setItemImages(collection, item, images) {
+        const nextImages = uniqueImages(images).slice(0, maxImagesPerItem);
+        return {
+          ...item,
+          images: nextImages,
+          ...(collection === "works" ? { image: nextImages[0] || "" } : {})
+        };
+      }
+
+      function setupFormState(form) {
+        const save = document.getElementById("saveRecord");
+        const initial = new FormData(form);
+        const snapshot = () =>
+          [...new FormData(form).entries()]
+            .filter(([name]) => name !== "")
+            .map(([name, value]) => `${name}:${value}`)
+            .join("|");
+        const initialSnapshot = [...initial.entries()].map(([name, value]) => `${name}:${value}`).join("|");
+        const updateDirty = () => {
+          if (save) save.disabled = snapshot() === initialSnapshot;
+        };
+        const updateCounts = () => {
+          form.querySelectorAll("[maxlength]").forEach((field) => {
+            const count = form.querySelector(`[data-count="${field.name}"]`);
+            if (count) count.textContent = `${field.value.length}/${field.maxLength}`;
+          });
+        };
+        form.addEventListener("input", () => {
+          updateCounts();
+          updateDirty();
+        });
+        form.addEventListener("change", () => {
+          updateCounts();
+          updateDirty();
+        });
+        updateCounts();
+        updateDirty();
       }
 
       function renderAdminTable(collection, items) {
@@ -2861,21 +3120,19 @@
         if (collection === "works") {
           return `
             <form id="recordForm">
-              <div class="preview">${item.image ? `<img src="${item.image}" alt="">` : `<span class="note">No image uploaded</span>`}</div>
-              <label>Artwork image<input id="imageInput" type="file" accept="image/*"></label>
-              <button class="btn secondary" type="button" id="clearImage">Remove Image</button>
-              <label class="switch-row"><input name="visible" type="checkbox" ${item.visible !== false ? "checked" : ""}> Visible on site</label>
-              <label>Title<input name="title" value="${escapeAttr(item.title)}" required></label>
+              ${renderMediaManager(collection, item)}
+              ${renderToggle(item.visible !== false)}
+              ${renderInputField("Title", "title", item.title, 120, true)}
               <div class="form-row">
-                <label>Year<input name="year" value="${escapeAttr(item.year)}"></label>
-                <label>Category<input name="category" value="${escapeAttr(item.category)}"></label>
+                ${renderInputField("Year", "year", item.year, 20)}
+                ${renderInputField("Category", "category", item.category, 40)}
               </div>
-              <label>Medium<input name="medium" value="${escapeAttr(item.medium)}"></label>
-              <label>Dimensions<input name="dimensions" value="${escapeAttr(item.dimensions)}"></label>
-              <label>Description<textarea name="description">${escapeHtml(item.description)}</textarea></label>
+              ${renderInputField("Medium", "medium", item.medium, 120)}
+              ${renderInputField("Dimensions", "dimensions", item.dimensions, 80)}
+              ${renderTextAreaField("Description", "description", item.description, 600)}
               <div class="modal-footer">
                 <button class="btn danger" type="button" id="deleteCurrent">Delete</button>
-                <button class="btn" type="submit">Save Work</button>
+                <button class="btn" type="submit" id="saveRecord" disabled>Save Work</button>
               </div>
             </form>
           `;
@@ -2883,16 +3140,18 @@
         return `
           <form id="recordForm">
             <div class="preview">${item.poster ? `<img src="${item.poster}" alt="">` : `<span class="note">No poster uploaded</span>`}</div>
-            <label>Exhibition poster<input id="posterInput" type="file" accept="image/*"></label>
-            <label class="switch-row"><input name="visible" type="checkbox" ${item.visible !== false ? "checked" : ""}> Visible on site</label>
-            <label>Title<input name="title" value="${escapeAttr(item.title)}" required></label>
+            <input class="file-input" id="posterInput" type="file" accept="image/*">
+            <label class="upload-btn" for="posterInput">Upload Poster</label>
+            ${renderMediaManager(collection, item)}
+            ${renderToggle(item.visible !== false)}
+            ${renderInputField("Title", "title", item.title, 140, true)}
             <div class="form-row">
-              <label>Type<input name="type" value="${escapeAttr(item.type)}"></label>
-              <label>Date<input name="date" value="${escapeAttr(item.date)}"></label>
+              ${renderInputField("Type", "type", item.type, 60)}
+              ${renderInputField("Date", "date", item.date, 80)}
             </div>
-            <label>Venue / publisher<input name="venue" value="${escapeAttr(item.venue)}"></label>
-            <label>Address<input name="address" value="${escapeAttr(item.address || "")}"></label>
-            <label>Description<textarea name="description">${escapeHtml(item.description)}</textarea></label>
+            ${renderInputField("Venue / publisher", "venue", item.venue, 160)}
+            ${renderInputField("Address", "address", item.address || "", 160)}
+            ${renderTextAreaField("Description", "description", item.description, 900)}
             <label>Linked works
               <div class="work-picker">
                 ${data.works
@@ -2909,9 +3168,65 @@
             </label>
             <div class="modal-footer">
               <button class="btn danger" type="button" id="deleteCurrent">Delete</button>
-              <button class="btn" type="submit">Save Exhibition</button>
+              <button class="btn" type="submit" id="saveRecord" disabled>Save Exhibition</button>
             </div>
           </form>
+        `;
+      }
+
+      function renderInputField(label, name, value, maxLength, required = false) {
+        return `
+          <label>
+            <span class="field-head"><span>${label}</span><span class="char-count" data-count="${name}">${text(value).length}/${maxLength}</span></span>
+            <input name="${name}" value="${escapeAttr(value)}" maxlength="${maxLength}" ${required ? "required" : ""}>
+          </label>
+        `;
+      }
+
+      function renderTextAreaField(label, name, value, maxLength) {
+        return `
+          <label>
+            <span class="field-head"><span>${label}</span><span class="char-count" data-count="${name}">${text(value).length}/${maxLength}</span></span>
+            <textarea name="${name}" maxlength="${maxLength}">${escapeHtml(value)}</textarea>
+          </label>
+        `;
+      }
+
+      function renderToggle(visible) {
+        return `
+          <label class="toggle-row">
+            <input name="visible" type="checkbox" ${visible ? "checked" : ""}>
+            <span class="toggle-track"></span>
+            <span>Visible on site</span>
+          </label>
+        `;
+      }
+
+      function renderMediaManager(collection, item) {
+        const images = uniqueImages(item.images || (collection === "works" && item.image ? [item.image] : [])).slice(0, maxImagesPerItem);
+        return `
+          <div class="media-manager">
+            <div class="media-toolbar">
+              <strong>Images</strong>
+              <span class="note">${images.length}/${maxImagesPerItem}</span>
+            </div>
+            <input class="file-input" id="imagesInput" type="file" accept="image/*" multiple ${images.length >= maxImagesPerItem ? "disabled" : ""}>
+            <label class="upload-btn" for="imagesInput">${images.length >= maxImagesPerItem ? "Maximum reached" : "Upload Images"}</label>
+            ${
+              images.length
+                ? `<div class="media-grid">${images
+                    .map(
+                      (image, index) => `
+                        <div class="media-thumb">
+                          <img src="${escapeAttr(image)}" alt="">
+                          <button class="media-remove" type="button" data-remove-image-index="${index}" aria-label="Remove image">×</button>
+                        </div>
+                      `
+                    )
+                    .join("")}</div>`
+                : `<p class="note">No images uploaded.</p>`
+            }
+          </div>
         `;
       }
 
@@ -2925,6 +3240,7 @@
           dimensions: "",
           description: "",
           image: "",
+          images: [],
           visible: true
         };
       }
@@ -3025,6 +3341,7 @@
       });
 
       document.getElementById("workGrid").addEventListener("click", (event) => {
+        if (handleCarouselClick(event)) return;
         const back = event.target.closest("[data-back-to='works']");
         if (back) {
           location.hash = "#works";
@@ -3067,6 +3384,7 @@
       });
 
       document.getElementById("exhibitionList").addEventListener("click", (event) => {
+        if (handleCarouselClick(event)) return;
         const back = event.target.closest("[data-back-to='exhibitions']");
         if (back) {
           location.hash = "#exhibitions";
@@ -3081,6 +3399,22 @@
         if (!item?.dataset.slug) return;
         location.hash = `#exhibitions/${item.dataset.slug}`;
       });
+
+      function handleCarouselClick(event) {
+        const prev = event.target.closest("[data-carousel-prev]");
+        const next = event.target.closest("[data-carousel-next]");
+        if (!prev && !next) return false;
+        const carousel = event.target.closest("[data-carousel]");
+        const slides = carousel.querySelectorAll(".carousel-slide");
+        const current = Number(carousel.dataset.current || 0);
+        const nextIndex = prev
+          ? (current - 1 + slides.length) % slides.length
+          : (current + 1) % slides.length;
+        carousel.dataset.current = String(nextIndex);
+        carousel.querySelector(".carousel-track").style.transform = `translateX(-${nextIndex * 100}%)`;
+        carousel.querySelector("[data-carousel-count]").textContent = `${nextIndex + 1} / ${slides.length}`;
+        return true;
+      }
 
       document.getElementById("exhibitionList").addEventListener("keydown", (event) => {
         if (event.key !== "Enter" && event.key !== " ") return;
