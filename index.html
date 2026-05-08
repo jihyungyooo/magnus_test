@@ -558,46 +558,21 @@
         height: auto;
       }
 
-      .media-carousel {
+      .detail-media-grid {
         display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 10px;
+        align-items: start;
       }
 
-      .carousel-frame {
-        position: relative;
-        overflow: hidden;
-      }
-
-      .carousel-track {
-        display: flex;
-        transition: transform 220ms ease;
-      }
-
-      .carousel-slide {
-        flex: 0 0 100%;
-      }
-
-      .carousel-slide img {
+      .detail-media-grid img {
         display: block;
         width: 100%;
         height: auto;
       }
 
-      .carousel-controls {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        gap: 12px;
-        color: #777;
-        font-size: 13px;
-      }
-
-      .carousel-controls button {
-        border: 0;
-        background: transparent;
-        padding: 0;
-        color: inherit;
-        cursor: pointer;
+      .detail-media-grid img:first-child {
+        grid-column: 1 / -1;
       }
 
       .detail-copy h2 {
@@ -821,6 +796,10 @@
         color: #fff;
         padding: 8px 12px;
         cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
       }
 
       .btn.secondary {
@@ -857,7 +836,7 @@
         width: 100%;
         min-width: 760px;
         border-collapse: collapse;
-        table-layout: fixed;
+        table-layout: auto;
       }
 
       .admin-table th,
@@ -887,26 +866,6 @@
         font-family: var(--display-font);
         font-size: 15px;
         font-weight: 520;
-      }
-
-      .row-actions {
-        display: flex;
-        justify-content: flex-end;
-        gap: 8px;
-      }
-
-      .text-btn {
-        border: 0;
-        background: transparent;
-        padding: 0;
-        color: #777;
-        cursor: pointer;
-        text-decoration: underline;
-        text-underline-offset: 3px;
-      }
-
-      .text-btn:hover {
-        color: var(--fg);
       }
 
       .admin-modal {
@@ -955,20 +914,22 @@
 
       .modal-body {
         overflow: auto;
-        padding: 20px;
+        padding: 20px 20px 0;
+        background: #fff;
       }
 
       .modal-footer {
         position: sticky;
         bottom: 0;
-        z-index: 1;
+        z-index: 4;
         display: flex;
         justify-content: space-between;
         gap: 12px;
-        margin: 18px -20px -20px;
+        margin: 18px -20px 0;
         padding: 14px 20px;
         border-top: 1px solid var(--line);
         background: #fff;
+        box-shadow: 0 -12px 24px rgba(255, 255, 255, 0.96);
       }
 
       .records {
@@ -1141,11 +1102,17 @@
       .upload-btn {
         display: inline-flex;
         align-items: center;
+        justify-content: center;
+        gap: 7px;
         min-height: 36px;
         border: 1px solid var(--fg);
         border-radius: 4px;
-        padding: 7px 11px;
+        background: var(--fg);
+        color: #fff;
+        padding: 7px 12px;
         cursor: pointer;
+        width: fit-content;
+        max-width: 180px;
       }
 
       .media-grid {
@@ -2569,7 +2536,7 @@
           <button class="detail-back" type="button" data-back-to="works">← Works</button>
           <article class="detail-layout">
             <div class="detail-media">
-              ${renderMediaCarousel(images, work.title)}
+              ${renderDetailImageGrid(images, work.title)}
             </div>
             <div class="detail-copy">
               <p class="kicker">${escapeHtml([work.category, work.year].filter(Boolean).join(" · "))}</p>
@@ -2584,29 +2551,14 @@
         `;
       }
 
-      function renderMediaCarousel(images, title) {
+      function renderDetailImageGrid(images, title) {
         if (!images.length) return "";
         if (images.length === 1) return `<img src="${escapeAttr(images[0])}" alt="${escapeAttr(title)}">`;
         return `
-          <div class="media-carousel" data-carousel data-current="0">
-            <div class="carousel-frame">
-              <div class="carousel-track" style="transform: translateX(0%);">
-                ${images
-                  .map(
-                    (image, index) => `
-                      <div class="carousel-slide">
-                        <img src="${escapeAttr(image)}" alt="${escapeAttr(title)} image ${index + 1}">
-                      </div>
-                    `
-                  )
-                  .join("")}
-              </div>
-            </div>
-            <div class="carousel-controls">
-              <button type="button" data-carousel-prev>Prev</button>
-              <span data-carousel-count>1 / ${images.length}</span>
-              <button type="button" data-carousel-next>Next</button>
-            </div>
+          <div class="detail-media-grid">
+            ${images
+              .map((image, index) => `<img src="${escapeAttr(image)}" alt="${escapeAttr(title)} image ${index + 1}">`)
+              .join("")}
           </div>
         `;
       }
@@ -2688,7 +2640,7 @@
           <button class="detail-back" type="button" data-back-to="exhibitions">← Exhibitions</button>
           <article class="detail-layout">
             <div class="detail-media">
-              ${renderMediaCarousel(images, `${entry.title} poster`)}
+              ${renderDetailImageGrid(images, `${entry.title} poster`)}
             </div>
             <div class="detail-copy">
               <p class="kicker">${escapeHtml(entry.type)}</p>
@@ -2865,7 +2817,13 @@
         }
         const current = items.find((item) => item.id === selected[collection]);
         document.getElementById("panelActions").innerHTML = `
-          <button class="btn" type="button" id="newRecord">New</button>
+          <button class="btn" type="button" id="newRecord">
+            <svg class="view-icon" viewBox="0 0 16 16" aria-hidden="true">
+              <path d="M8 3v10"></path>
+              <path d="M3 8h10"></path>
+            </svg>
+            New
+          </button>
         `;
         document.getElementById("adminPanel").innerHTML = `
           <div class="admin-table-wrap">
@@ -2878,20 +2836,6 @@
             if (event.target.closest("button, a, input")) return;
             selected[collection] = row.dataset.editId;
             renderAdmin();
-          });
-        });
-        document.querySelectorAll("[data-visibility-id]").forEach((button) => {
-          button.addEventListener("click", () => {
-            const item = data[button.dataset.collection].find((entry) => entry.id === button.dataset.visibilityId);
-            if (!item) return;
-            item.visible = item.visible === false;
-            saveData(item.visible ? "Item is now visible on the site." : "Item is now hidden from the site.");
-            renderAdmin();
-          });
-        });
-        document.querySelectorAll("[data-row-delete-id]").forEach((button) => {
-          button.addEventListener("click", () => {
-            deleteItem(collection, button.dataset.rowDeleteId);
           });
         });
         document.getElementById("newRecord").addEventListener("click", () => {
@@ -3019,8 +2963,7 @@
                   <th>Year</th>
                   <th>Type</th>
                   <th>Medium</th>
-                  <th>Status</th>
-                  <th></th>
+              <th>Status</th>
                 </tr>
               </thead>
               <tbody>
@@ -3037,8 +2980,7 @@
                 <th>Date</th>
                 <th>Type</th>
                 <th>Linked Works</th>
-                <th>Status</th>
-                <th></th>
+              <th>Status</th>
               </tr>
             </thead>
             <tbody>
@@ -3050,14 +2992,6 @@
 
       function renderAdminRow(collection, item) {
         const status = `<span class="status-pill ${item.visible !== false ? "live" : ""}">${item.visible !== false ? "Visible" : "Hidden"}</span>`;
-        const commonActions = `
-          <div class="row-actions">
-            <button class="text-btn" type="button" data-visibility-id="${escapeAttr(item.id)}" data-collection="${collection}">
-              ${item.visible !== false ? "Hide" : "Show"}
-            </button>
-            <button class="text-btn" type="button" data-row-delete-id="${escapeAttr(item.id)}">Delete</button>
-          </div>
-        `;
         if (collection === "works") {
           return `
             <tr data-edit-id="${escapeAttr(item.id)}">
@@ -3066,7 +3000,6 @@
               <td>${escapeHtml(item.category)}</td>
               <td>${escapeHtml(item.medium)}</td>
               <td>${status}</td>
-              <td>${commonActions}</td>
             </tr>
           `;
         }
@@ -3077,7 +3010,6 @@
             <td>${escapeHtml(item.type)}</td>
             <td>${escapeHtml(String(item.workIds?.length || 0))}</td>
             <td>${status}</td>
-            <td>${commonActions}</td>
           </tr>
         `;
       }
@@ -3141,7 +3073,7 @@
           <form id="recordForm">
             <div class="preview">${item.poster ? `<img src="${item.poster}" alt="">` : `<span class="note">No poster uploaded</span>`}</div>
             <input class="file-input" id="posterInput" type="file" accept="image/*">
-            <label class="upload-btn" for="posterInput">Upload Poster</label>
+            <label class="upload-btn" for="posterInput">${imageIcon()} Upload Poster</label>
             ${renderMediaManager(collection, item)}
             ${renderToggle(item.visible !== false)}
             ${renderInputField("Title", "title", item.title, 140, true)}
@@ -3211,7 +3143,7 @@
               <span class="note">${images.length}/${maxImagesPerItem}</span>
             </div>
             <input class="file-input" id="imagesInput" type="file" accept="image/*" multiple ${images.length >= maxImagesPerItem ? "disabled" : ""}>
-            <label class="upload-btn" for="imagesInput">${images.length >= maxImagesPerItem ? "Maximum reached" : "Upload Images"}</label>
+            <label class="upload-btn" for="imagesInput">${imageIcon()} ${images.length >= maxImagesPerItem ? "Maximum reached" : "Upload Images"}</label>
             ${
               images.length
                 ? `<div class="media-grid">${images
@@ -3227,6 +3159,16 @@
                 : `<p class="note">No images uploaded.</p>`
             }
           </div>
+        `;
+      }
+
+      function imageIcon() {
+        return `
+          <svg class="view-icon" viewBox="0 0 16 16" aria-hidden="true">
+            <rect x="2.5" y="3" width="11" height="10" rx="1"></rect>
+            <path d="M4 11l3-3 2 2 1.5-1.5L13 11"></path>
+            <path d="M10.5 5.5h.01"></path>
+          </svg>
         `;
       }
 
@@ -3341,7 +3283,6 @@
       });
 
       document.getElementById("workGrid").addEventListener("click", (event) => {
-        if (handleCarouselClick(event)) return;
         const back = event.target.closest("[data-back-to='works']");
         if (back) {
           location.hash = "#works";
@@ -3384,7 +3325,6 @@
       });
 
       document.getElementById("exhibitionList").addEventListener("click", (event) => {
-        if (handleCarouselClick(event)) return;
         const back = event.target.closest("[data-back-to='exhibitions']");
         if (back) {
           location.hash = "#exhibitions";
@@ -3399,22 +3339,6 @@
         if (!item?.dataset.slug) return;
         location.hash = `#exhibitions/${item.dataset.slug}`;
       });
-
-      function handleCarouselClick(event) {
-        const prev = event.target.closest("[data-carousel-prev]");
-        const next = event.target.closest("[data-carousel-next]");
-        if (!prev && !next) return false;
-        const carousel = event.target.closest("[data-carousel]");
-        const slides = carousel.querySelectorAll(".carousel-slide");
-        const current = Number(carousel.dataset.current || 0);
-        const nextIndex = prev
-          ? (current - 1 + slides.length) % slides.length
-          : (current + 1) % slides.length;
-        carousel.dataset.current = String(nextIndex);
-        carousel.querySelector(".carousel-track").style.transform = `translateX(-${nextIndex * 100}%)`;
-        carousel.querySelector("[data-carousel-count]").textContent = `${nextIndex + 1} / ${slides.length}`;
-        return true;
-      }
 
       document.getElementById("exhibitionList").addEventListener("keydown", (event) => {
         if (event.key !== "Enter" && event.key !== " ") return;
