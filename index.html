@@ -1,0 +1,2192 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Artist Archive</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #fff;
+        --fg: #0a0a0a;
+        --muted: #777;
+        --line: #d7d7d7;
+        --soft: #f6f6f6;
+        --focus: #111;
+        --max: 1320px;
+        --display-font: "New York Large", "New York", "Iowan Old Style", Georgia, serif;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display",
+          "Helvetica Neue", Arial, sans-serif;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--fg);
+        font-size: 15px;
+        line-height: 1.42;
+        letter-spacing: 0;
+      }
+
+      button,
+      input,
+      textarea,
+      select {
+        font: inherit;
+      }
+
+      button,
+      a {
+        color: inherit;
+      }
+
+      a {
+        text-decoration-thickness: 1px;
+        text-underline-offset: 3px;
+      }
+
+      .frame {
+        max-width: var(--max);
+        margin: 0 auto;
+        padding: 0 28px;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        background: rgba(255, 255, 255, 0.94);
+        border-bottom: 1px solid var(--line);
+        backdrop-filter: blur(12px);
+      }
+
+      .nav {
+        display: grid;
+        grid-template-columns: minmax(140px, 1fr) auto minmax(140px, 1fr);
+        align-items: center;
+        min-height: 44px;
+        gap: 24px;
+      }
+
+      .brand {
+        font-weight: 560;
+        text-decoration: none;
+      }
+
+      .nav-center,
+      .nav-right {
+        display: flex;
+        align-items: center;
+        gap: 28px;
+      }
+
+      .nav-center {
+        justify-content: center;
+      }
+
+      .nav-right {
+        justify-content: flex-end;
+      }
+
+      .nav a,
+      .nav button {
+        border: 0;
+        background: transparent;
+        padding: 0;
+        color: #8a8a8a;
+        cursor: pointer;
+        font-weight: 520;
+        text-decoration: none;
+        white-space: nowrap;
+      }
+
+      .nav a:hover,
+      .nav button:hover,
+      .nav .active {
+        color: var(--fg);
+      }
+
+      .search-panel {
+        display: none;
+        border-top: 1px solid var(--line);
+        background: #fff;
+      }
+
+      .search-panel.open {
+        display: block;
+      }
+
+      .search-form {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 12px;
+        padding: 16px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .search-form input {
+        border: 0;
+        border-radius: 0;
+        padding: 6px 0;
+        font-size: 18px;
+      }
+
+      .search-form button {
+        border: 0;
+        background: transparent;
+        color: #777;
+        cursor: pointer;
+      }
+
+      .search-results {
+        display: grid;
+        gap: 0;
+        max-height: min(56vh, 520px);
+        overflow: auto;
+        padding-bottom: 10px;
+      }
+
+      .search-result {
+        display: grid;
+        grid-template-columns: 140px 1fr;
+        gap: 24px;
+        width: 100%;
+        border: 0;
+        border-bottom: 1px solid var(--line);
+        background: transparent;
+        padding: 14px 0;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .search-result span {
+        color: #777;
+      }
+
+      .search-result strong {
+        display: block;
+        margin-bottom: 4px;
+        font-family: var(--display-font);
+        font-size: 18px;
+        font-weight: 520;
+      }
+
+      .search-result small {
+        display: block;
+        color: #555;
+        font-size: 13px;
+      }
+
+      .search-empty {
+        padding: 18px 0 22px;
+        color: #777;
+      }
+
+      .page {
+        display: none;
+      }
+
+      .page.active {
+        display: block;
+      }
+
+      .home-blank {
+        min-height: calc(100vh - 44px);
+        border-bottom: 0;
+      }
+
+      .home-blank .hero-inner {
+        min-height: calc(100vh - 44px);
+        padding: 0;
+      }
+
+      .home-blank .hero-inner > * {
+        display: none;
+      }
+
+      .hero-inner {
+        display: grid;
+        grid-template-columns: 1.1fr 0.9fr;
+        gap: 48px;
+        min-height: 320px;
+        align-items: end;
+        padding-top: 56px;
+        padding-bottom: 34px;
+      }
+
+      h1 {
+        margin: 0;
+        max-width: 820px;
+        font-family: var(--display-font);
+        font-size: clamp(34px, 4.6vw, 64px);
+        line-height: 1;
+        letter-spacing: 0;
+        font-weight: 560;
+      }
+
+      .intro {
+        max-width: 520px;
+        margin: 0;
+        color: #222;
+        font-size: 16px;
+      }
+
+      .section-head {
+        display: grid;
+        grid-template-columns: minmax(170px, 0.35fr) 1fr;
+        gap: 28px;
+        align-items: baseline;
+        padding: 24px 0 14px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .page-title {
+        padding: 42px 0 22px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .page-title h1 {
+        font-family: var(--display-font);
+        font-size: clamp(32px, 4.2vw, 52px);
+        font-weight: 520;
+      }
+
+      .section-head h2 {
+        margin: 0;
+        font-family: var(--display-font);
+        font-size: 15px;
+        font-weight: 560;
+      }
+
+      .section-tools {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        gap: 24px;
+        min-width: 0;
+      }
+
+      .filters {
+        display: flex;
+        gap: 22px;
+        overflow-x: auto;
+        color: #9a9a9a;
+        font-weight: 500;
+      }
+
+      .filters button {
+        flex: 0 0 auto;
+        border: 0;
+        padding: 0;
+        background: transparent;
+        color: inherit;
+        cursor: pointer;
+      }
+
+      .filters .selected {
+        color: var(--fg);
+      }
+
+      .view-options {
+        display: flex;
+        flex: 0 0 auto;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .view-options button {
+        border: 0;
+        background: transparent;
+        width: 32px;
+        height: 26px;
+        display: grid;
+        place-items: center;
+        padding: 0;
+        color: #777;
+        cursor: pointer;
+      }
+
+      .view-options button + button {
+        border-left: 1px solid var(--line);
+      }
+
+      .view-options .selected {
+        background: #f3f3f3;
+        color: var(--fg);
+      }
+
+      .view-icon {
+        width: 14px;
+        height: 14px;
+        display: block;
+      }
+
+      .view-icon rect,
+      .view-icon line {
+        stroke: currentColor;
+        stroke-width: 1.5;
+        fill: none;
+      }
+
+      .index-list {
+        padding: 16px 0 70px;
+      }
+
+      .index-row {
+        display: grid;
+        grid-template-columns: 1.2fr 0.8fr 0.8fr 0.8fr;
+        gap: 24px;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--line);
+        cursor: pointer;
+      }
+
+      .index-row strong {
+        font-family: var(--display-font);
+        font-size: 18px;
+        font-weight: 520;
+        line-height: 1.16;
+      }
+
+      .index-row span {
+        color: #333;
+        font-size: 14px;
+      }
+
+      .index-row .muted {
+        color: #777;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 48px 62px;
+        padding: 28px 0 68px;
+      }
+
+      .work-card {
+        min-width: 0;
+        cursor: pointer;
+      }
+
+      .thumb {
+        width: 100%;
+        display: block;
+        margin-bottom: 16px;
+        border: 0;
+        background: transparent;
+        overflow: visible;
+      }
+
+      .thumb img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .no-image {
+        color: #aaa;
+        font-size: 13px;
+      }
+
+      .kicker {
+        margin: 0 0 8px;
+        font-size: 13px;
+        color: #202020;
+      }
+
+      .work-card h3,
+      .list-item h3 {
+        margin: 0;
+        font-family: var(--display-font);
+        font-size: 20px;
+        line-height: 1.14;
+        font-weight: 560;
+      }
+
+      .meta {
+        margin: 12px 0 0;
+        color: #222;
+        white-space: pre-line;
+        font-size: 14px;
+      }
+
+      .desc {
+        margin: 12px 0 0;
+        color: #202020;
+        font-size: 14px;
+      }
+
+      .list {
+        padding: 18px 0 70px;
+      }
+
+      .list-item {
+        display: grid;
+        grid-template-columns: minmax(170px, 0.35fr) minmax(0, 1fr);
+        gap: 28px;
+        padding: 22px 0;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .list-item[role="button"] {
+        cursor: pointer;
+      }
+
+      .exhibition-item {
+        grid-template-columns: minmax(130px, 0.22fr) minmax(0, 0.42fr) minmax(0, 1fr);
+        align-items: start;
+      }
+
+      .poster {
+        display: block;
+        width: 100%;
+        max-width: 180px;
+        height: auto;
+      }
+
+      .exhibition-gallery {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 8px;
+        margin-top: 16px;
+      }
+
+      .exhibition-gallery img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .source-link {
+        display: inline-block;
+        margin-top: 14px;
+        color: #777;
+        font-size: 13px;
+      }
+
+      .address {
+        margin: 10px 0 0;
+        color: #555;
+        font-size: 14px;
+      }
+
+      .detail {
+        padding: 24px 0 78px;
+      }
+
+      .detail-back {
+        border: 0;
+        background: transparent;
+        padding: 0;
+        color: #777;
+        cursor: pointer;
+        margin-bottom: 26px;
+      }
+
+      .detail-layout {
+        display: grid;
+        grid-template-columns: minmax(220px, 0.42fr) minmax(0, 1fr);
+        gap: 44px;
+        align-items: start;
+      }
+
+      .detail-media img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .detail-copy h2 {
+        margin: 0;
+        font-family: var(--display-font);
+        font-size: clamp(28px, 4vw, 48px);
+        line-height: 1;
+        font-weight: 520;
+      }
+
+      .detail-meta {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 18px 28px;
+        margin: 28px 0;
+        padding: 18px 0;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+      }
+
+      .detail-meta span {
+        display: block;
+        color: #777;
+        font-size: 13px;
+        margin-bottom: 4px;
+      }
+
+      .detail-text {
+        max-width: 780px;
+        font-size: 16px;
+        line-height: 1.5;
+      }
+
+      .detail-gallery {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 14px;
+        margin-top: 28px;
+      }
+
+      .detail-gallery img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .work-gallery {
+        margin-top: 28px;
+      }
+
+      .date {
+        color: #777;
+        font-weight: 500;
+      }
+
+      .bio {
+        display: grid;
+        grid-template-columns: minmax(170px, 0.35fr) minmax(0, 1fr);
+        gap: 28px;
+        padding: 34px 0 78px;
+      }
+
+      .bio p {
+        max-width: 760px;
+        margin: 0 0 18px;
+        font-size: 17px;
+        line-height: 1.48;
+      }
+
+      .footer {
+        border-top: 1px solid var(--line);
+        padding: 24px 0 42px;
+        color: #777;
+      }
+
+      .studio {
+        display: none;
+        background: #fff;
+      }
+
+      .studio.active {
+        display: block;
+      }
+
+      .site.hidden {
+        display: none;
+      }
+
+      .studio-shell {
+        display: grid;
+        grid-template-columns: 260px 1fr;
+        min-height: 100vh;
+      }
+
+      .side {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        border-right: 1px solid var(--line);
+        padding: 22px;
+      }
+
+      .side h2 {
+        margin: 0 0 28px;
+        font-size: 18px;
+        font-weight: 560;
+      }
+
+      .side button,
+      .side a {
+        display: block;
+        width: 100%;
+        margin: 0 0 6px;
+        border: 0;
+        background: transparent;
+        padding: 10px 0;
+        text-align: left;
+        color: #777;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .side .picked {
+        color: var(--fg);
+        font-weight: 560;
+      }
+
+      .panel {
+        padding: 28px 34px 70px;
+      }
+
+      .panel-head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding-bottom: 24px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .panel-head h1 {
+        font-size: 30px;
+        line-height: 1.05;
+        font-weight: 560;
+      }
+
+      .actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      .btn {
+        min-height: 38px;
+        border: 1px solid var(--fg);
+        border-radius: 4px;
+        background: var(--fg);
+        color: #fff;
+        padding: 8px 12px;
+        cursor: pointer;
+      }
+
+      .btn.secondary {
+        background: #fff;
+        color: var(--fg);
+      }
+
+      .btn.danger {
+        border-color: #aaa;
+        background: #fff;
+        color: #555;
+      }
+
+      .editor {
+        display: grid;
+        grid-template-columns: minmax(280px, 0.9fr) minmax(340px, 1.1fr);
+        gap: 28px;
+        padding-top: 24px;
+      }
+
+      .records {
+        border-right: 1px solid var(--line);
+        padding-right: 28px;
+      }
+
+      .record {
+        width: 100%;
+        border: 0;
+        border-bottom: 1px solid var(--line);
+        background: #fff;
+        padding: 14px 0;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .record strong {
+        display: block;
+        font-size: 16px;
+        font-weight: 560;
+      }
+
+      .record span {
+        display: block;
+        margin-top: 3px;
+        color: #777;
+      }
+
+      .record.current strong {
+        text-decoration: underline;
+        text-underline-offset: 4px;
+      }
+
+      form {
+        display: grid;
+        gap: 16px;
+      }
+
+      label {
+        display: grid;
+        gap: 7px;
+        color: #555;
+        font-size: 13px;
+        font-weight: 560;
+      }
+
+      input,
+      textarea,
+      select {
+        width: 100%;
+        border: 1px solid #bdbdbd;
+        border-radius: 4px;
+        padding: 11px 12px;
+        background: #fff;
+        color: var(--fg);
+      }
+
+      textarea {
+        min-height: 120px;
+        resize: vertical;
+      }
+
+      input:focus,
+      textarea:focus,
+      select:focus,
+      button:focus-visible,
+      a:focus-visible {
+        outline: 2px solid var(--focus);
+        outline-offset: 2px;
+      }
+
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+      }
+
+      .preview {
+        min-height: 180px;
+        border: 1px solid var(--line);
+        background: var(--soft);
+        display: grid;
+        place-items: center;
+        overflow: hidden;
+      }
+
+      .preview img {
+        width: 100%;
+        height: 100%;
+        max-height: 280px;
+        object-fit: cover;
+      }
+
+      .note {
+        color: #777;
+        font-size: 13px;
+      }
+
+      @media (max-width: 880px) {
+        .frame {
+          padding: 0 18px;
+        }
+
+        .nav {
+          display: flex;
+          min-height: auto;
+          padding: 12px 0;
+          align-items: flex-start;
+          justify-content: space-between;
+        }
+
+        .nav-center {
+          order: 3;
+          width: 100%;
+          justify-content: flex-start;
+          gap: 16px;
+          overflow-x: auto;
+          padding-top: 10px;
+        }
+
+        .nav-right {
+          gap: 14px;
+        }
+
+        .section-tools {
+          display: grid;
+          gap: 12px;
+        }
+
+        .hero-inner,
+        .section-head,
+        .list-item,
+        .bio,
+        .editor,
+        .studio-shell {
+          grid-template-columns: 1fr;
+        }
+
+        .hero-inner {
+          gap: 22px;
+          min-height: 280px;
+          padding-top: 42px;
+        }
+
+        .grid {
+          grid-template-columns: 1fr;
+          gap: 40px;
+        }
+
+        .index-row {
+          grid-template-columns: 1fr;
+          gap: 6px;
+        }
+
+        .exhibition-item {
+          grid-template-columns: 1fr;
+        }
+
+        .poster {
+          max-width: 240px;
+        }
+
+        .exhibition-gallery {
+          grid-template-columns: 1fr;
+        }
+
+        .detail-layout,
+        .detail-meta,
+        .detail-gallery {
+          grid-template-columns: 1fr;
+        }
+
+        .studio-shell {
+          display: block;
+        }
+
+        .side {
+          position: static;
+          height: auto;
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+        }
+
+        .records {
+          border-right: 0;
+          border-bottom: 1px solid var(--line);
+          padding-right: 0;
+          padding-bottom: 16px;
+        }
+
+        .panel {
+          padding: 22px 18px 60px;
+        }
+
+        .panel-head {
+          display: grid;
+        }
+
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="site" id="site">
+      <header class="topbar">
+        <nav class="frame nav" aria-label="주요 메뉴">
+          <a class="brand" href="#home" data-nav="home">Artist Name</a>
+          <div class="nav-center">
+            <a href="#works" data-nav="works">Works</a>
+            <a href="#exhibitions" data-nav="exhibitions">Exhibitions</a>
+            <a href="#activities" data-nav="activities">Activities</a>
+            <a href="#biography" data-nav="biography">Biography</a>
+          </div>
+          <div class="nav-right">
+            <button type="button" id="searchToggle">Search</button>
+            <a href="#/studio">Studio</a>
+          </div>
+        </nav>
+        <div class="search-panel" id="searchPanel" aria-hidden="true">
+          <div class="frame">
+            <form class="search-form" id="searchForm">
+              <input id="searchInput" type="search" placeholder="Search" autocomplete="off" />
+              <button type="button" id="searchClose">Close</button>
+            </form>
+            <div class="search-results" id="searchResults"></div>
+          </div>
+        </div>
+      </header>
+
+      <section class="page hero home-blank" id="home" data-page="home">
+        <div class="frame hero-inner">
+          <h1 id="artistName">Artist Name</h1>
+          <p class="intro" id="artistStatement"></p>
+        </div>
+      </section>
+
+      <section class="page" id="works" data-page="works">
+        <div class="frame page-title">
+          <h1>Works</h1>
+        </div>
+        <div class="frame">
+          <div class="section-head">
+            <h2>Works</h2>
+            <div class="section-tools">
+              <div class="filters" id="workFilters"></div>
+              <div class="view-options" id="workViewOptions">
+                <button class="selected" type="button" data-work-view="grid" aria-label="Grid view" title="Grid view">
+                  <svg class="view-icon" viewBox="0 0 16 16" aria-hidden="true">
+                    <rect x="2" y="2" width="4" height="4"></rect>
+                    <rect x="10" y="2" width="4" height="4"></rect>
+                    <rect x="2" y="10" width="4" height="4"></rect>
+                    <rect x="10" y="10" width="4" height="4"></rect>
+                  </svg>
+                </button>
+                <button type="button" data-work-view="list" aria-label="List view" title="List view">
+                  <svg class="view-icon" viewBox="0 0 16 16" aria-hidden="true">
+                    <line x1="2" y1="4" x2="14" y2="4"></line>
+                    <line x1="2" y1="8" x2="14" y2="8"></line>
+                    <line x1="2" y1="12" x2="14" y2="12"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="grid" id="workGrid"></div>
+        </div>
+      </section>
+
+      <section class="page" id="exhibitions" data-page="exhibitions">
+        <div class="frame page-title">
+          <h1>Exhibitions</h1>
+        </div>
+        <div class="frame">
+          <div class="section-head">
+            <h2>Exhibitions</h2>
+            <div class="section-tools">
+              <div class="filters" id="exhibitionFilters">
+                <button class="selected" type="button" data-exhibition-filter="All">All</button>
+                <button type="button" data-exhibition-filter="Solo">Solo</button>
+                <button type="button" data-exhibition-filter="Group">Group</button>
+                <button type="button" data-exhibition-filter="Fairs">Fairs</button>
+              </div>
+              <div class="view-options" id="exhibitionViewOptions">
+                <button class="selected" type="button" data-exhibition-view="grid" aria-label="Grid view" title="Grid view">
+                  <svg class="view-icon" viewBox="0 0 16 16" aria-hidden="true">
+                    <rect x="2" y="2" width="4" height="4"></rect>
+                    <rect x="10" y="2" width="4" height="4"></rect>
+                    <rect x="2" y="10" width="4" height="4"></rect>
+                    <rect x="10" y="10" width="4" height="4"></rect>
+                  </svg>
+                </button>
+                <button type="button" data-exhibition-view="list" aria-label="List view" title="List view">
+                  <svg class="view-icon" viewBox="0 0 16 16" aria-hidden="true">
+                    <line x1="2" y1="4" x2="14" y2="4"></line>
+                    <line x1="2" y1="8" x2="14" y2="8"></line>
+                    <line x1="2" y1="12" x2="14" y2="12"></line>
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="list" id="exhibitionList"></div>
+        </div>
+      </section>
+
+      <section class="page" id="activities" data-page="activities">
+        <div class="frame page-title">
+          <h1>Activities</h1>
+        </div>
+        <div class="frame">
+          <div class="section-head">
+            <h2>Activities</h2>
+            <div class="filters">
+              <button class="selected" type="button">Recent</button>
+              <button type="button">Talks</button>
+              <button type="button">Publications</button>
+              <button type="button">Press</button>
+            </div>
+          </div>
+          <div class="list" id="activityList"></div>
+        </div>
+      </section>
+
+      <section class="page" id="biography" data-page="biography">
+        <div class="frame page-title">
+          <h1>Biography</h1>
+        </div>
+        <div class="frame">
+          <div class="section-head">
+            <h2>Biography</h2>
+            <div></div>
+          </div>
+          <div class="bio">
+            <div class="date" id="birthInfo"></div>
+            <div id="bioText"></div>
+          </div>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <div class="frame">© <span id="year"></span> <span id="footerName"></span></div>
+      </footer>
+    </main>
+
+    <main class="studio" id="studio">
+      <div class="studio-shell">
+        <aside class="side">
+          <h2>Back Office</h2>
+          <button class="picked" type="button" data-admin-tab="profile">Profile</button>
+          <button type="button" data-admin-tab="works">Works</button>
+          <button type="button" data-admin-tab="exhibitions">Exhibitions</button>
+          <button type="button" data-admin-tab="activities">Activities</button>
+          <a href="#home">View Site</a>
+        </aside>
+        <section class="panel">
+          <div class="panel-head">
+            <h1 id="panelTitle">Profile</h1>
+            <div class="actions" id="panelActions"></div>
+          </div>
+          <div id="adminPanel"></div>
+        </section>
+      </div>
+    </main>
+
+    <template id="workCardTemplate">
+      <article class="work-card">
+        <div class="thumb"></div>
+        <p class="kicker"></p>
+        <h3></h3>
+        <p class="meta"></p>
+        <p class="desc"></p>
+      </article>
+    </template>
+
+    <script>
+      const storeKey = "artist-homepage-content-v7";
+      const emptyImage = "";
+      const uid = () =>
+        globalThis.crypto?.randomUUID?.() || `item-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
+      const workImageSets = {
+        "ATTIC NARRATIVES": [
+          "assets/oyoung/2024-01-knock_006.png",
+          "assets/oyoung/2024-01-AtticNarratives_001-scaled.jpg",
+          "assets/oyoung/2024-01-AtticNarratives_002-scaled.jpg"
+        ],
+        "I AM IN HIS DRAWING ROOM · SIT ON HER QUIETLY · FOR HIM WHO DOESN’T LIKE THE COLD FLOOR": [
+          "assets/oyoung/2023-08-I-AM-IN-HIS-DRAWING-ROOM.jpg",
+          "assets/oyoung/2023-08-I-AM-IN-HIS-DRAWING-ROOM-2.jpeg"
+        ],
+        "HOT EVEN IF THE FIREWOOD DOESN’T BURN": [
+          "assets/oyoung/2023-08-HOT-EVEN-IF-THE-FIREWOOD-DOESNT-BURN-WOOD.jpeg",
+          "assets/oyoung/2023-08-HOT-EVEN-IF-THE-FIREWOOD-DOESNT-BURN-T2-scaled.jpg",
+          "assets/oyoung/2023-08-HOT-EVEN-IF-THE-FIREWOOD-DOESNT-BURN-WOOD-2.jpeg"
+        ],
+        "The Mischievous Garden of a Lonely Being": [
+          "assets/oyoung/2022-12-The-Mischievous-Garden-of-a-Lonely-Being-1.jpg",
+          "assets/oyoung/2022-12-The-Mischievous-Garden-of-a-Lonely-Being-1-1.jpg",
+          "assets/oyoung/2022-12-The-Mischievous-Garden-of-a-Lonely-Being-2.jpg"
+        ],
+        "Emptiness": [
+          "assets/oyoung/2022-12-emptiness.png",
+          "assets/oyoung/2022-12-em1.png",
+          "assets/oyoung/2022-12-emptiness_movie.png"
+        ],
+        "Romantic Will": [
+          "assets/oyoung/2022-12-romantic_will.png",
+          "assets/oyoung/2023-08-ABucketOfTearsUntilItsBeautiful_Exhibition_07.jpg",
+          "assets/oyoung/2023-08-ABucketOfTearsUntilItsBeautiful_Exhibition_08.jpg"
+        ]
+      };
+
+      const exhibitionImageSets = {
+        "DAY, YET LINGERING LE JOUR DEMEURE": {
+          poster: "assets/oyoung/2025-10-dayyet.jpg",
+          images: [
+            "assets/oyoung/2026-01-a01-scaled.jpg",
+            "assets/oyoung/2026-01-a06-scaled.jpg",
+            "assets/oyoung/2026-01-01-scaled.jpg",
+            "assets/oyoung/2026-01-02-scaled.jpg",
+            "assets/oyoung/2026-01-03-scaled.jpg",
+            "assets/oyoung/2026-01-04-scaled.jpg",
+            "assets/oyoung/2026-01-05-scaled.jpg",
+            "assets/oyoung/2026-01-06-scaled.jpg",
+            "assets/oyoung/2026-01-07-scaled.jpg",
+            "assets/oyoung/2026-01-08-scaled.jpg",
+            "assets/oyoung/2026-01-09-scaled.jpg",
+            "assets/oyoung/2026-01-10-scaled.jpg"
+          ]
+        },
+        "NAKED FACE": {
+          poster: "assets/oyoung/2024-08-exhibition_poster_nakedface.jpg",
+          images: ["assets/oyoung/2024-08-nf_01.jpg", "assets/oyoung/2024-08-nf_02.jpg"]
+        },
+        "KNOCK KNOCK": {
+          poster: "assets/oyoung/2023-09-exhibition_poster_04-1.jpg",
+          images: [
+            "assets/oyoung/2024-01-knock_001-scaled.jpg",
+            "assets/oyoung/2024-01-knock_002-scaled.jpg",
+            "assets/oyoung/2024-01-knock_004-scaled.jpg",
+            "assets/oyoung/2024-01-knock_005-scaled.jpg",
+            "assets/oyoung/2024-01-knock_007-scaled.jpg",
+            "assets/oyoung/2024-01-Knock-Knock-BG-scaled.jpg"
+          ]
+        },
+        "HER ATTIC": {
+          poster: "assets/oyoung/2023-09-exhibition_poster_03.jpg",
+          images: [
+            "assets/oyoung/2024-01-Her-Attic_001.jpg",
+            "assets/oyoung/2024-01-Her-Attic_002.jpg",
+            "assets/oyoung/2024-01-Her-Attic_003.jpg",
+            "assets/oyoung/2024-01-Her-Attic_004.jpg",
+            "assets/oyoung/2024-01-Her-Attic_005.jpg",
+            "assets/oyoung/2024-01-Het-Attic_006.jpg",
+            "assets/oyoung/2024-01-Her-Attic_007.jpg",
+            "assets/oyoung/2024-01-Her-Attic_008.png"
+          ]
+        },
+        "DESIRE BUT DO NOT DO, BECOME ILL": {
+          poster: "assets/oyoung/2023-06-exhibition_poster_01-724x1024.png",
+          images: [
+            "assets/oyoung/2023-08-Ex2_01.jpg",
+            "assets/oyoung/2023-08-Ex2_02.jpg",
+            "assets/oyoung/2023-08-Ex2_03.jpg",
+            "assets/oyoung/2023-08-Ex2_04.jpg",
+            "assets/oyoung/2023-08-Ex2_05.jpg",
+            "assets/oyoung/2023-08-Ex2_06.jpg",
+            "assets/oyoung/2023-08-Ex2_07.jpg"
+          ]
+        },
+        "A BUCKET OF TEARS UNTIL IT’S BEAUTIFUL": {
+          poster: "assets/oyoung/2023-08-Pex1.png",
+          images: [
+            "assets/oyoung/2023-08-ABucketOfTearsUntilItsBeautiful_Exhibition_01.jpg",
+            "assets/oyoung/2023-08-ABucketOfTearsUntilItsBeautiful_Exhibition_02.png",
+            "assets/oyoung/2023-08-ABucketOfTearsUntilItsBeautiful_Exhibition_03.jpg",
+            "assets/oyoung/2023-08-ABucketOfTearsUntilItsBeautiful_Exhibition_04-scaled.jpg",
+            "assets/oyoung/2023-08-ABucketOfTearsUntilItsBeautiful_Exhibition_05.jpg",
+            "assets/oyoung/2023-08-ABucketOfTearsUntilItsBeautiful_Exhibition_06-scaled.jpg",
+            "assets/oyoung/2023-08-ABucketOfTearsUntilItsBeautiful_Exhibition_07.jpg",
+            "assets/oyoung/2023-08-ABucketOfTearsUntilItsBeautiful_Exhibition_08.jpg",
+            "assets/oyoung/2023-08-ABucketOfTearsUntilItsBeautiful_Exhibition_09.jpg"
+          ]
+        }
+      };
+
+      const initialData = {
+        profile: {
+          name: "O YOUNG",
+          statement:
+            "오영은 존재의 이유와 존재의 근본적인 외로움에 대한 작업을 한다. 평면, 입체, 움직이는 이미지, 텍스트를 오가며 각 존재가 자기의 계world를 구축하는 과정을 다룬다.",
+          born:
+            "오영. Fine Art and History of Art, Goldsmiths College, University of London; Aesthetics, Seoul National University; Psychology and Public Administration, Yonsei University.",
+          bio:
+            "오영은 존재의 이유와 존재의 근본적인 외로움에 대한 작업을 한다. 그가 바라보는 인간은 삶과 죽음의 경계에서 그 외로움을 어떤 방법으로든 이해하려는 존재이자, 어떤 방법으로든 자기의 집을 짓고 자기 계world를 구축하는 존재이다.\n\n그는 고립과 고독, 외로움의 감정을 경험하게 되는 때에 등장하는 미화beautification와 낭만화romanticisation의 방식에 주목한다. 특정 미디엄에 집중하기보다 평면, 입체, 움직이는 이미지, 텍스트 등 다양한 형태로 그 물음의 과정을 다룬다.\n\nO Young works on the reasons for existence and the fundamental loneliness of being. Her work asks how solitary beings confront loneliness, understand it from different perspectives, and turn it into a quiet yet vivid sensation.\n\nContact: youngoh.e@gmail.com · Instagram: ___________young"
+        },
+        works: [
+          {
+            id: uid(),
+            title: "ATTIC NARRATIVES",
+            year: "2023",
+            category: "Text",
+            medium: "Framed text on the wall",
+            dimensions: "",
+            description: "From the Knock Knock / Her Attic period.",
+            image: "assets/oyoung/2024-01-knock_006.png"
+          },
+          {
+            id: uid(),
+            title: "I AM IN HIS DRAWING ROOM · SIT ON HER QUIETLY · FOR HIM WHO DOESN’T LIKE THE COLD FLOOR",
+            year: "2023",
+            category: "Installation",
+            medium: "Styrofoam and polyurethane; metal; print on carpet",
+            dimensions: "630 × 400 × 400mm; 3000 × 2000mm",
+            description: "Three-part installation work.",
+            image: "assets/oyoung/2023-08-I-AM-IN-HIS-DRAWING-ROOM.jpg"
+          },
+          {
+            id: uid(),
+            title: "HOT EVEN IF THE FIREWOOD DOESN’T BURN",
+            year: "2023",
+            category: "Installation",
+            medium: "Wood",
+            dimensions: "2100 × 1000 × 310mm",
+            description: "장작이 타지 않아도 뜨겁기를.",
+            image: "assets/oyoung/2023-08-HOT-EVEN-IF-THE-FIREWOOD-DOESNT-BURN-WOOD.jpeg"
+          },
+          {
+            id: uid(),
+            title: "STAY STILL",
+            year: "2023",
+            category: "Painting",
+            medium: "Oil on canvas",
+            dimensions: "320 × 410mm",
+            description: "그대로 있어.",
+            image: "assets/oyoung/2023-08-STAY-STILL.jpg"
+          },
+          {
+            id: uid(),
+            title: "‘WHAT ARE YOU DOING?’",
+            year: "2023",
+            category: "Painting",
+            medium: "Oil on canvas",
+            dimensions: "455 × 379mm",
+            description: "‘뭐하고 있어?’",
+            image: "assets/oyoung/2023-08-WHAT-ARE-YOU-DOING.jpg"
+          },
+          {
+            id: uid(),
+            title: "FROM BEHIND",
+            year: "2023",
+            category: "Painting",
+            medium: "Oil on canvas",
+            dimensions: "651 × 530mm",
+            description: "기습.",
+            image: "assets/oyoung/2023-08-FROM-BEHIND.jpg"
+          },
+          {
+            id: uid(),
+            title: "IT’S MY FAULT",
+            year: "2023",
+            category: "Painting",
+            medium: "Oil on canvas",
+            dimensions: "727 × 606mm",
+            description: "내가 잘못했어.",
+            image: "assets/oyoung/2023-08-ITS-MY-FAULT.jpg"
+          },
+          {
+            id: uid(),
+            title: "A CHILD BY THE WATER",
+            year: "2023",
+            category: "Painting",
+            medium: "Oil on canvas",
+            dimensions: "910 × 1168mm",
+            description: "물가에 내놓은 아이.",
+            image: "assets/oyoung/2023-08-A-CHILD-BY-THE-WATER.jpg"
+          },
+          {
+            id: uid(),
+            title: "WHAT’S WRONG?",
+            year: "2023",
+            category: "Painting",
+            medium: "Oil on canvas",
+            dimensions: "1168 × 803mm",
+            description: "왜 그래? From DESIRE BUT DO NOT DO, BECOME ILL.",
+            image: "assets/oyoung/2023-08-WHATS-WRONG.jpg"
+          },
+          {
+            id: uid(),
+            title: "CE N’EST PAS UN CITRON",
+            year: "2023",
+            category: "Painting",
+            medium: "Oil on canvas",
+            dimensions: "727 × 606mm",
+            description: "THIS IS NOT A LEMON.",
+            image: "assets/oyoung/2023-08-CE-NEST-PAS-UN-CITRON-scaled.jpg"
+          },
+          {
+            id: uid(),
+            title: "YOUR EYES AND MINE UNDERLINE THE SAME SENTENCE",
+            year: "2023",
+            category: "Painting",
+            medium: "Oil on canvas",
+            dimensions: "1168 × 803mm",
+            description: "너와 나의 눈은 같은 문장에 밑줄을 긋지.",
+            image: "assets/oyoung/2023-08-YOUR-EYES-AND-MINE-UNDERLINE-THE-SAME-SENTENCE-.jpg"
+          },
+          {
+            id: uid(),
+            title: "LYING ON THE GRASS",
+            year: "2023",
+            category: "Painting",
+            medium: "Oil on canvas",
+            dimensions: "910 × 651mm",
+            description: "아 풀밭이다.",
+            image: "assets/oyoung/2023-08-LYING-ON-THE-GRASS-.jpeg"
+          },
+          {
+            id: uid(),
+            title: "INSTINCTIF ET CÉRÉBRAL",
+            year: "2022",
+            category: "Installation",
+            medium: "Plaster clay, wood, and text on the wall",
+            dimensions: "Size variable",
+            description: "본능적이고 지적이게.",
+            image: "assets/oyoung/2023-01-Instinctively-and-Intelligently.jpeg"
+          },
+          {
+            id: uid(),
+            title: "A Bucket of Tears Until It’s Beautiful",
+            year: "2022",
+            category: "Installation",
+            medium: "Styrofoam and polyurethane",
+            dimensions: "Size variable",
+            description: "아름답기까지는 흘릴 눈물이 한 바가지.",
+            image: "assets/oyoung/2022-12-A-Bucket-of-Tears-Until-Its-Beautiful-1.jpg"
+          },
+          {
+            id: uid(),
+            title: "The Mischievous Garden of a Lonely Being",
+            year: "2022",
+            category: "Installation",
+            medium: "Acrylic, plaster, wood, steel, moss, and stone",
+            dimensions: "Size variable",
+            description: "외로운 존재의 짓궂은 정원.",
+            image: "assets/oyoung/2022-12-The-Mischievous-Garden-of-a-Lonely-Being-1.jpg"
+          },
+          {
+            id: uid(),
+            title: "A Wind",
+            year: "2022",
+            category: "Painting",
+            medium: "Oil on wooden panel",
+            dimensions: "1165 × 910mm",
+            description: "예기치 않았던 일들이 일어났다.",
+            image: "assets/oyoung/2022-12-A-Wind.jpg"
+          },
+          {
+            id: uid(),
+            title: "I am on the Table",
+            year: "2022",
+            category: "Painting",
+            medium: "Oil on canvas and wood",
+            dimensions: "1165 × 800mm",
+            description: "가족과 고독, 테이블 위에 놓이는 자기에 관한 작업.",
+            image: "assets/oyoung/2022-12-I-AM-ON-THE-TABLE-1.jpg"
+          },
+          {
+            id: uid(),
+            title: "Romantic Will",
+            year: "2020",
+            category: "Text",
+            medium: "One channel video, 3min 22sec",
+            dimensions: "Projection on the floor or wall",
+            description: "삶, 죽음, 사랑, 낭만화에 관한 영상 작업.",
+            image: "assets/oyoung/2022-12-romantic_will.png"
+          }
+        ],
+        exhibitions: [
+          {
+            id: uid(),
+            title: "DAY, YET LINGERING LE JOUR DEMEURE",
+            type: "Solo Exhibition",
+            date: "September 12–October 2, 2025",
+            venue: "METAPHOR SEOUL, Seoul, Korea",
+            address: "140-1 Samcheong-ro, Jongno-gu, Seoul",
+            description:
+              "O의 이야기, 아직 낮이에요. 낮이라는 시간을 삶의 한 시절로 겹쳐 보며, 아직 남아 있다고 믿고 싶은 시간과 어린 날의 감각을 다루는 개인전.",
+            poster: "assets/oyoung/2025-10-dayyet.jpg",
+            images: [
+              "assets/oyoung/2026-01-a01-scaled.jpg",
+              "assets/oyoung/2026-01-a06-scaled.jpg",
+              "assets/oyoung/2026-01-01-scaled.jpg"
+            ],
+            link: "https://oyoung.gallery/exhibition-day-yet-lingering-le-jour-demeure/"
+          },
+          {
+            id: uid(),
+            title: "NAKED FACE",
+            type: "Group Exhibition",
+            date: "July 9–August 3, 2024",
+            venue: "SAMSEYOUNG GALLERY | 삼세영갤러리, Seoul, Korea",
+            address: "2, Pyeongchang 44-gil, Jongno-gu, Seoul",
+            description:
+              "민낯을 존재의 조건과 가족적 기원으로 바라보는 전시. ‘어떤 사람인 체’ 하는 표면 아래 드러나는 자기의 긴장을 다룬다.",
+            poster: "assets/oyoung/2024-08-exhibition_poster_nakedface.jpg",
+            images: [
+              "assets/oyoung/2024-08-nf_01.jpg",
+              "assets/oyoung/2024-08-nf_02.jpg"
+            ],
+            link: "https://oyoung.gallery/exhibition-naked-face/"
+          },
+          {
+            id: uid(),
+            title: "KNOCK KNOCK",
+            type: "Group Exhibition",
+            date: "October 10–15, 2023",
+            venue: "SEOUL AUCTION GALLERY | 서울옥션갤러리, Seoul, Korea",
+            address: "24 Pyeongchang 30-gil, Jongno-gu, Seoul",
+            description:
+              "JAMUNBAK ART RESIDENCY EXHIBITION. 서로 다른 매체와 감각을 가진 작가들이 작업의 문을 두드리고, 각자의 가지를 더 멀리 뻗어가는 과정을 보여준 단체전.",
+            poster: "assets/oyoung/2023-09-exhibition_poster_04-1.jpg",
+            images: [
+              "assets/oyoung/2024-01-knock_001-scaled.jpg",
+              "assets/oyoung/2024-01-knock_002-scaled.jpg",
+              "assets/oyoung/2024-01-knock_004-scaled.jpg"
+            ],
+            link: "https://oyoung.gallery/exhibition-knock-knock/"
+          },
+          {
+            id: uid(),
+            title: "HER ATTIC",
+            type: "Solo Exhibition",
+            date: "September 12–24, 2023",
+            venue: "BUKCHON EXHIBITION ROOM | 북촌전시실, Seoul, Korea",
+            address: "48 Bukchon-ro 5-gil, Jongno-gu, Seoul",
+            description:
+              "작가의 이전 개인전 작업들을 작은 다락방처럼 모아 재배치한 개인전. 공적인 태도보다 더 내밀한 방의 형식으로 자기고백과 전달의 어려움을 드러낸다.",
+            poster: "assets/oyoung/2023-09-exhibition_poster_03.jpg",
+            images: [
+              "assets/oyoung/2024-01-Her-Attic_001.jpg",
+              "assets/oyoung/2024-01-Her-Attic_002.jpg",
+              "assets/oyoung/2024-01-Her-Attic_003.jpg"
+            ],
+            link: "https://oyoung.gallery/exhibition-her-attic/"
+          },
+          {
+            id: uid(),
+            title: "DESIRE BUT DO NOT DO, BECOME ILL",
+            type: "Solo Exhibition",
+            date: "July 3–August 6, 2023",
+            venue: "PFS GALLERY, Seoul, Korea",
+            address: "4-8, Wangsimni 6-gil, Seongdong-gu, Seoul",
+            description:
+              "욕망할 뿐 행하지 않으면 병이 난다. 부재하는 것에 대한 욕망, 행위가 되지 못한 욕구, 그로 인해 변형되는 마음과 몸을 짓궂고 조용한 공간으로 구성한 개인전.",
+            poster: "assets/oyoung/2023-06-exhibition_poster_01-724x1024.png",
+            images: [
+              "assets/oyoung/2023-08-Ex2_01.jpg",
+              "assets/oyoung/2023-08-Ex2_02.jpg",
+              "assets/oyoung/2023-08-Ex2_03.jpg"
+            ],
+            link: "https://oyoung.gallery/exhibition-desire-but-do-not-do-become-ill/"
+          },
+          {
+            id: uid(),
+            title: "A BUCKET OF TEARS UNTIL IT’S BEAUTIFUL",
+            type: "Solo Exhibition",
+            date: "November 2–20, 2022",
+            venue: "GALLERY METAPHOR 32, Seoul, Korea",
+            address: "32 Pyeongchang 7-gil, Jongno-gu, Seoul",
+            description:
+              "아름답기까지는 흘릴 눈물이 한 바가지. 외로움의 전달 불가능성과 신체, 언어, 죽음의 상상을 통해 각자의 내면을 감각하게 하는 개인전.",
+            poster: "assets/oyoung/2023-08-Pex1.png",
+            images: [
+              "assets/oyoung/2023-08-ABucketOfTearsUntilItsBeautiful_Exhibition_01.jpg",
+              "assets/oyoung/2023-08-ABucketOfTearsUntilItsBeautiful_Exhibition_02.png",
+              "assets/oyoung/2023-08-ABucketOfTearsUntilItsBeautiful_Exhibition_03.jpg"
+            ],
+            link: "https://oyoung.gallery/exhibition-a-bucket-of-tears-until-its-beautiful/"
+          }
+        ],
+        activities: [
+          {
+            id: uid(),
+            title: "The Room of Words",
+            type: "Reading Session",
+            date: "2026",
+            venue: "HISTOIRE D’O",
+            description:
+              "SESSION 01: A LOVER’S DISCOURSE, 사랑의 단상 – 롤랑 바르트. SESSION 02: EROTISM, 에로티즘 – 조르주 바타유."
+          },
+          {
+            id: uid(),
+            title: "Work-related inquiries",
+            type: "Contact",
+            date: "Ongoing",
+            venue: "youngoh.e@gmail.com",
+            description: "Instagram: ___________young"
+          }
+        ]
+      };
+
+      let data = loadData();
+      let adminTab = "profile";
+      let selected = { works: data.works[0]?.id, exhibitions: data.exhibitions[0]?.id, activities: data.activities[0]?.id };
+      let activeWorkCategory = "All";
+      let activeExhibitionFilter = "All";
+      let activeWorkView = "grid";
+      let activeExhibitionView = "grid";
+
+      function loadData() {
+        try {
+          const saved = localStorage.getItem(storeKey);
+          if (!saved) return hydrateMediaData(initialData);
+          return hydrateMediaData(JSON.parse(saved));
+        } catch {
+          return hydrateMediaData(initialData);
+        }
+      }
+
+      function hydrateMediaData(content) {
+        content.works = content.works.map((work) => {
+          const images = workImageSets[work.title] || work.images || (work.image ? [work.image] : []);
+          return { ...work, image: work.image || images[0] || "", images };
+        });
+        content.exhibitions = content.exhibitions.map((entry) => {
+          const media = exhibitionImageSets[entry.title];
+          if (!media) return entry;
+          return { ...entry, poster: media.poster || entry.poster, images: media.images };
+        });
+        return content;
+      }
+
+      function saveData() {
+        try {
+          localStorage.setItem(storeKey, JSON.stringify(data));
+        } catch {
+          console.warn("Browser storage is unavailable; changes will last until the page is reloaded.");
+        }
+        renderSite();
+      }
+
+      function text(value) {
+        return value || "";
+      }
+
+      function slugify(value) {
+        return text(value)
+          .toLowerCase()
+          .normalize("NFKD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9가-힣]+/g, "-")
+          .replace(/^-+|-+$/g, "")
+          .slice(0, 80);
+      }
+
+      function itemSlug(item) {
+        return item.slug || slugify(item.title || item.id);
+      }
+
+      function renderSite() {
+        document.title = `${data.profile.name} — Artist Homepage`;
+        document.querySelector(".brand").textContent = data.profile.name;
+        document.getElementById("artistName").textContent = data.profile.name;
+        document.getElementById("artistStatement").textContent = data.profile.statement;
+        document.getElementById("birthInfo").textContent = data.profile.born;
+        document.getElementById("bioText").innerHTML = data.profile.bio
+          .split("\n")
+          .filter(Boolean)
+          .map((paragraph) => `<p>${escapeHtml(paragraph)}</p>`)
+          .join("");
+        document.getElementById("year").textContent = new Date().getFullYear();
+        document.getElementById("footerName").textContent = data.profile.name;
+        renderFilters();
+        renderWorks();
+        renderExhibitionList();
+        renderEntryList("activityList", data.activities);
+        renderRoute();
+      }
+
+      function renderFilters() {
+        const categories = ["All", ...new Set(data.works.map((work) => work.category).filter(Boolean))];
+        if (!categories.includes(activeWorkCategory)) activeWorkCategory = "All";
+        document.getElementById("workFilters").innerHTML = categories
+          .map(
+            (category) =>
+              `<button type="button" class="${category === activeWorkCategory ? "selected" : ""}" data-category="${escapeAttr(category)}">${escapeHtml(category)}</button>`
+          )
+          .join("");
+      }
+
+      function renderExhibitionFilters() {
+        document.querySelectorAll("[data-exhibition-filter]").forEach((button) => {
+          button.classList.toggle("selected", button.dataset.exhibitionFilter === activeExhibitionFilter);
+        });
+      }
+
+      function renderViewOptions() {
+        document.querySelectorAll("[data-work-view]").forEach((button) => {
+          button.classList.toggle("selected", button.dataset.workView === activeWorkView);
+        });
+        document.querySelectorAll("[data-exhibition-view]").forEach((button) => {
+          button.classList.toggle("selected", button.dataset.exhibitionView === activeExhibitionView);
+        });
+      }
+
+      function renderWorks() {
+        const grid = document.getElementById("workGrid");
+        const route = currentRoute();
+        if (route.page === "works" && route.detail) {
+          const work = data.works.find((item) => itemSlug(item) === route.detail);
+          grid.className = "detail";
+          grid.innerHTML = work ? renderWorkDetail(work) : `<div class="search-empty">Work not found.</div>`;
+          return;
+        }
+        const works =
+          activeWorkCategory === "All"
+            ? data.works
+            : data.works.filter((work) => work.category === activeWorkCategory);
+        if (activeWorkView === "list") {
+          grid.className = "index-list";
+          grid.innerHTML =
+            works
+              .map(
+                (work) => `
+                  <article class="index-row work-row" role="button" tabindex="0" data-slug="${escapeAttr(itemSlug(work))}">
+                    <strong>${escapeHtml(work.title)}</strong>
+                    <span>${escapeHtml(work.medium)}</span>
+                    <span>${escapeHtml(work.dimensions)}</span>
+                    <span class="muted">${escapeHtml([work.category, work.year].filter(Boolean).join(" · "))}</span>
+                  </article>
+                `
+              )
+              .join("") || `<div class="search-empty">No works in this category.</div>`;
+          return;
+        }
+        grid.className = "grid";
+        grid.innerHTML = "";
+        works.forEach((work) => {
+          const node = document.getElementById("workCardTemplate").content.cloneNode(true);
+          const card = node.querySelector(".work-card");
+          card.dataset.slug = itemSlug(work);
+          card.setAttribute("role", "button");
+          card.setAttribute("tabindex", "0");
+          const thumb = node.querySelector(".thumb");
+          thumb.innerHTML = work.image
+            ? `<img src="${work.image}" alt="${escapeAttr(work.title)}">`
+            : `<span class="no-image">Image reserved for artwork</span>`;
+          node.querySelector(".kicker").textContent = [work.category, work.year].filter(Boolean).join(" · ");
+          node.querySelector("h3").textContent = work.title;
+          node.querySelector(".meta").textContent = [work.medium, work.dimensions].filter(Boolean).join("\n");
+          node.querySelector(".desc").remove();
+          grid.appendChild(node);
+        });
+      }
+
+      function renderWorkDetail(work) {
+        return `
+          <button class="detail-back" type="button" data-back-to="works">← Works</button>
+          <article class="detail-layout">
+            <div class="detail-media">
+              ${work.image ? `<img src="${escapeAttr(work.image)}" alt="${escapeAttr(work.title)}">` : ""}
+            </div>
+            <div class="detail-copy">
+              <p class="kicker">${escapeHtml([work.category, work.year].filter(Boolean).join(" · "))}</p>
+              <h2>${escapeHtml(work.title)}</h2>
+              <div class="detail-meta">
+                <div><span>Medium</span>${escapeHtml(work.medium)}</div>
+                <div><span>Dimensions</span>${escapeHtml(work.dimensions)}</div>
+              </div>
+              <p class="detail-text">${escapeHtml(work.description)}</p>
+              ${
+                work.images?.length > 1
+                  ? `<div class="detail-gallery work-gallery">${work.images
+                      .slice(1)
+                      .map((image) => `<img src="${escapeAttr(image)}" alt="${escapeAttr(work.title)} detail view">`)
+                      .join("")}</div>`
+                  : ""
+              }
+            </div>
+          </article>
+        `;
+      }
+
+      function renderEntryList(elementId, entries) {
+        document.getElementById(elementId).innerHTML = entries
+          .map(
+            (entry) => `
+              <article class="list-item">
+                <div class="date">${escapeHtml(entry.date)}</div>
+                <div>
+                  <p class="kicker">${escapeHtml(entry.type)}</p>
+                  <h3>${escapeHtml(entry.title)}</h3>
+                  <p class="meta">${escapeHtml(entry.venue)}</p>
+                  <p class="desc">${escapeHtml(entry.description)}</p>
+                </div>
+              </article>
+            `
+          )
+          .join("");
+      }
+
+      function renderExhibitionList() {
+        const target = document.getElementById("exhibitionList");
+        const route = currentRoute();
+        if (route.page === "exhibitions" && route.detail) {
+          const entry = data.exhibitions.find((item) => itemSlug(item) === route.detail);
+          target.className = "detail";
+          target.innerHTML = entry ? renderExhibitionDetail(entry) : `<div class="search-empty">Exhibition not found.</div>`;
+          return;
+        }
+        target.className = "list";
+        const exhibitions =
+          activeExhibitionFilter === "All"
+            ? data.exhibitions
+            : data.exhibitions.filter((entry) => text(entry.type).toLowerCase().includes(activeExhibitionFilter.toLowerCase()));
+        if (activeExhibitionView === "list") {
+          target.className = "index-list";
+          target.innerHTML =
+            exhibitions
+              .map(
+                (entry) => `
+                  <article class="index-row exhibition-row" role="button" tabindex="0" data-slug="${escapeAttr(itemSlug(entry))}">
+                    <strong>${escapeHtml(entry.title)}</strong>
+                    <span>${escapeHtml(entry.date)}</span>
+                    <span>${escapeHtml(entry.venue)}</span>
+                    <span class="muted">${escapeHtml(entry.type)}</span>
+                  </article>
+                `
+              )
+              .join("") || `<div class="search-empty">No exhibitions in this category.</div>`;
+          return;
+        }
+        target.innerHTML = exhibitions
+          .map(
+            (entry) => `
+              <article class="list-item exhibition-item" role="button" tabindex="0" data-slug="${escapeAttr(itemSlug(entry))}">
+                <div>
+                  ${entry.poster ? `<img class="poster" src="${escapeAttr(entry.poster)}" alt="${escapeAttr(entry.title)} poster">` : `<div class="date">${escapeHtml(entry.date)}</div>`}
+                </div>
+                <div>
+                  <div class="date">${escapeHtml(entry.date)}</div>
+                  <p class="meta">${escapeHtml(entry.venue)}</p>
+                  ${entry.address ? `<p class="address">${escapeHtml(entry.address)}</p>` : ""}
+                </div>
+                <div>
+                  <p class="kicker">${escapeHtml(entry.type)}</p>
+                  <h3>${escapeHtml(entry.title)}</h3>
+                </div>
+              </article>
+            `
+          )
+          .join("") || `<div class="search-empty">No exhibitions in this category.</div>`;
+      }
+
+      function renderExhibitionDetail(entry) {
+        return `
+          <button class="detail-back" type="button" data-back-to="exhibitions">← Exhibitions</button>
+          <article class="detail-layout">
+            <div class="detail-media">
+              ${entry.poster ? `<img src="${escapeAttr(entry.poster)}" alt="${escapeAttr(entry.title)} poster">` : ""}
+            </div>
+            <div class="detail-copy">
+              <p class="kicker">${escapeHtml(entry.type)}</p>
+              <h2>${escapeHtml(entry.title)}</h2>
+              <div class="detail-meta">
+                <div><span>Period</span>${escapeHtml(entry.date)}</div>
+                <div><span>Venue</span>${escapeHtml(entry.venue)}</div>
+                ${entry.address ? `<div><span>Address</span>${escapeHtml(entry.address)}</div>` : ""}
+              </div>
+              <p class="detail-text">${escapeHtml(entry.description)}</p>
+              ${
+                entry.images?.length
+                  ? `<div class="detail-gallery">${entry.images
+                      .map((image) => `<img src="${escapeAttr(image)}" alt="${escapeAttr(entry.title)} installation view">`)
+                      .join("")}</div>`
+                  : ""
+              }
+              ${entry.link ? `<a class="source-link" href="${escapeAttr(entry.link)}" target="_blank" rel="noreferrer">Original exhibition page</a>` : ""}
+            </div>
+          </article>
+        `;
+      }
+
+      function getSearchItems() {
+        return [
+          ...data.works.map((work) => ({
+            page: "works",
+            slug: itemSlug(work),
+            type: work.category || "Work",
+            title: work.title,
+            detail: [work.year, work.medium, work.dimensions, work.description].filter(Boolean).join(" · ")
+          })),
+          ...data.exhibitions.map((entry) => ({
+            page: "exhibitions",
+            slug: itemSlug(entry),
+            type: entry.type || "Exhibition",
+            title: entry.title,
+            detail: [entry.date, entry.venue, entry.address, entry.description].filter(Boolean).join(" · ")
+          })),
+          ...data.activities.map((entry) => ({
+            page: "activities",
+            type: entry.type || "Activity",
+            title: entry.title,
+            detail: [entry.date, entry.venue, entry.description].filter(Boolean).join(" · ")
+          })),
+          {
+            page: "biography",
+            type: "Biography",
+            title: data.profile.name,
+            detail: [data.profile.statement, data.profile.born, data.profile.bio].filter(Boolean).join(" · ")
+          }
+        ];
+      }
+
+      function renderSearchResults(query = "") {
+        const target = document.getElementById("searchResults");
+        const normalized = query.trim().toLowerCase();
+        if (!normalized) {
+          target.innerHTML = `<div class="search-empty">Type to search works, exhibitions, activities, and biography.</div>`;
+          return;
+        }
+        const results = getSearchItems().filter((item) =>
+          [item.type, item.title, item.detail].join(" ").toLowerCase().includes(normalized)
+        );
+        target.innerHTML =
+          results
+            .map(
+              (item) => `
+                <button class="search-result" type="button" data-page-target="${escapeAttr(item.page)}" data-slug="${escapeAttr(item.slug || "")}">
+                  <span>${escapeHtml(item.page)}</span>
+                  <div>
+                    <strong>${escapeHtml(item.title)}</strong>
+                    <small>${escapeHtml(item.type)}${item.detail ? ` · ${escapeHtml(item.detail)}` : ""}</small>
+                  </div>
+                </button>
+              `
+            )
+            .join("") || `<div class="search-empty">No results for “${escapeHtml(query)}”.</div>`;
+      }
+
+      function openSearch() {
+        const panel = document.getElementById("searchPanel");
+        panel.classList.add("open");
+        panel.setAttribute("aria-hidden", "false");
+        renderSearchResults(document.getElementById("searchInput").value);
+        document.getElementById("searchInput").focus();
+      }
+
+      function closeSearch() {
+        const panel = document.getElementById("searchPanel");
+        panel.classList.remove("open");
+        panel.setAttribute("aria-hidden", "true");
+      }
+
+      function renderAdmin() {
+        document.getElementById("panelTitle").textContent = tabTitle(adminTab);
+        document.querySelectorAll("[data-admin-tab]").forEach((button) => {
+          button.classList.toggle("picked", button.dataset.adminTab === adminTab);
+        });
+        if (adminTab === "profile") renderProfileAdmin();
+        if (adminTab === "works") renderCollectionAdmin("works", blankWork);
+        if (adminTab === "exhibitions") renderCollectionAdmin("exhibitions", blankEntry);
+        if (adminTab === "activities") renderCollectionAdmin("activities", blankEntry);
+      }
+
+      function tabTitle(tab) {
+        return { profile: "Profile", works: "Works", exhibitions: "Exhibitions", activities: "Activities" }[tab];
+      }
+
+      function renderProfileAdmin() {
+        document.getElementById("panelActions").innerHTML = `<button class="btn secondary" type="button" id="resetData">Reset Sample</button>`;
+        document.getElementById("adminPanel").innerHTML = `
+          <div class="editor">
+            <div class="records">
+              <p class="note">작가명, 소개, 약력은 공개 홈페이지 전체에 바로 반영됩니다.</p>
+            </div>
+            <form id="profileForm">
+              <label>Artist name<input name="name" value="${escapeAttr(data.profile.name)}" required></label>
+              <label>Short statement<textarea name="statement" required>${escapeHtml(data.profile.statement)}</textarea></label>
+              <label>Birth / location<input name="born" value="${escapeAttr(data.profile.born)}"></label>
+              <label>Biography<textarea name="bio" required>${escapeHtml(data.profile.bio)}</textarea></label>
+              <button class="btn" type="submit">Save Profile</button>
+            </form>
+          </div>
+        `;
+        document.getElementById("profileForm").addEventListener("submit", (event) => {
+          event.preventDefault();
+          data.profile = Object.fromEntries(new FormData(event.currentTarget));
+          saveData();
+          renderAdmin();
+        });
+        document.getElementById("resetData").addEventListener("click", () => {
+          if (!confirm("샘플 데이터로 되돌릴까요? 업로드한 이미지와 수정 내용이 사라집니다.")) return;
+          data = structuredClone(initialData);
+          selected = { works: data.works[0]?.id, exhibitions: data.exhibitions[0]?.id, activities: data.activities[0]?.id };
+          saveData();
+          renderAdmin();
+        });
+      }
+
+      function renderCollectionAdmin(collection, blankFactory) {
+        const items = data[collection];
+        if (!selected[collection] || !items.some((item) => item.id === selected[collection])) {
+          selected[collection] = items[0]?.id;
+        }
+        const current = items.find((item) => item.id === selected[collection]);
+        document.getElementById("panelActions").innerHTML = `
+          <button class="btn" type="button" id="newRecord">New</button>
+          <button class="btn danger" type="button" id="deleteRecord">Delete</button>
+        `;
+        document.getElementById("adminPanel").innerHTML = `
+          <div class="editor">
+            <div class="records">
+              ${items
+                .map(
+                  (item) => `
+                    <button class="record ${item.id === selected[collection] ? "current" : ""}" type="button" data-id="${item.id}">
+                      <strong>${escapeHtml(item.title)}</strong>
+                      <span>${escapeHtml(item.date || item.year || item.type || "")}</span>
+                    </button>
+                  `
+                )
+                .join("") || `<p class="note">아직 등록된 항목이 없습니다.</p>`}
+            </div>
+            <div>${current ? renderForm(collection, current) : `<p class="note">New 버튼으로 첫 항목을 등록하세요.</p>`}</div>
+          </div>
+        `;
+        document.querySelectorAll(".record").forEach((button) => {
+          button.addEventListener("click", () => {
+            selected[collection] = button.dataset.id;
+            renderAdmin();
+          });
+        });
+        document.getElementById("newRecord").addEventListener("click", () => {
+          const item = blankFactory();
+          data[collection].unshift(item);
+          selected[collection] = item.id;
+          saveData();
+          renderAdmin();
+        });
+        document.getElementById("deleteRecord").addEventListener("click", () => {
+          if (!current || !confirm("이 항목을 삭제할까요?")) return;
+          data[collection] = data[collection].filter((item) => item.id !== current.id);
+          selected[collection] = data[collection][0]?.id;
+          saveData();
+          renderAdmin();
+        });
+        const form = document.getElementById("recordForm");
+        if (form) {
+          form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const values = Object.fromEntries(new FormData(event.currentTarget));
+            const index = data[collection].findIndex((item) => item.id === current.id);
+            data[collection][index] = { ...current, ...values };
+            saveData();
+            renderAdmin();
+          });
+          const imageInput = document.getElementById("imageInput");
+          if (imageInput) {
+            imageInput.addEventListener("change", async (event) => {
+              const file = event.target.files[0];
+              if (!file) return;
+              const image = await fileToDataUrl(file);
+              const index = data[collection].findIndex((item) => item.id === current.id);
+              data[collection][index] = { ...current, image };
+              saveData();
+              renderAdmin();
+            });
+            const clear = document.getElementById("clearImage");
+            clear.addEventListener("click", () => {
+              const index = data[collection].findIndex((item) => item.id === current.id);
+              data[collection][index] = { ...current, image: "" };
+              saveData();
+              renderAdmin();
+            });
+          }
+        }
+      }
+
+      function renderForm(collection, item) {
+        if (collection === "works") {
+          return `
+            <form id="recordForm">
+              <div class="preview">${item.image ? `<img src="${item.image}" alt="">` : `<span class="note">No image uploaded</span>`}</div>
+              <label>Artwork image<input id="imageInput" type="file" accept="image/*"></label>
+              <button class="btn secondary" type="button" id="clearImage">Remove Image</button>
+              <label>Title<input name="title" value="${escapeAttr(item.title)}" required></label>
+              <div class="form-row">
+                <label>Year<input name="year" value="${escapeAttr(item.year)}"></label>
+                <label>Category<input name="category" value="${escapeAttr(item.category)}"></label>
+              </div>
+              <label>Medium<input name="medium" value="${escapeAttr(item.medium)}"></label>
+              <label>Dimensions<input name="dimensions" value="${escapeAttr(item.dimensions)}"></label>
+              <label>Description<textarea name="description">${escapeHtml(item.description)}</textarea></label>
+              <button class="btn" type="submit">Save Work</button>
+            </form>
+          `;
+        }
+        return `
+          <form id="recordForm">
+            <label>Title<input name="title" value="${escapeAttr(item.title)}" required></label>
+            <div class="form-row">
+              <label>Type<input name="type" value="${escapeAttr(item.type)}"></label>
+              <label>Date<input name="date" value="${escapeAttr(item.date)}"></label>
+            </div>
+            <label>Venue / publisher<input name="venue" value="${escapeAttr(item.venue)}"></label>
+            <label>Description<textarea name="description">${escapeHtml(item.description)}</textarea></label>
+            <button class="btn" type="submit">Save ${collection === "exhibitions" ? "Exhibition" : "Activity"}</button>
+          </form>
+        `;
+      }
+
+      function blankWork() {
+        return {
+          id: uid(),
+          title: "New Work",
+          year: new Date().getFullYear().toString(),
+          category: "Painting",
+          medium: "",
+          dimensions: "",
+          description: "",
+          image: ""
+        };
+      }
+
+      function blankEntry() {
+        return {
+          id: uid(),
+          title: "New Entry",
+          type: "",
+          date: "",
+          venue: "",
+          description: ""
+        };
+      }
+
+      function fileToDataUrl(file) {
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
+      function escapeHtml(value) {
+        return text(value)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function escapeAttr(value) {
+        return escapeHtml(value).replaceAll("\n", " ");
+      }
+
+      function currentPage() {
+        return currentRoute().page;
+      }
+
+      function currentRoute() {
+        const clean = location.hash.replace(/^#\/?/, "") || "home";
+        const [page, detail] = clean.split("/");
+        const safePage = ["home", "works", "exhibitions", "activities", "biography"].includes(page) ? page : "home";
+        return { page: safePage, detail: detail || "" };
+      }
+
+      function renderRoute() {
+        const page = currentPage();
+        document.querySelectorAll("[data-page]").forEach((section) => {
+          section.classList.toggle("active", section.dataset.page === page);
+        });
+        document.querySelectorAll("[data-nav]").forEach((link) => {
+          link.classList.toggle("active", link.dataset.nav === page);
+        });
+        document.querySelector(".footer").style.display = page === "home" ? "none" : "";
+        if (page === "works") {
+          renderFilters();
+          renderViewOptions();
+          renderWorks();
+        }
+        if (page === "exhibitions") {
+          renderExhibitionFilters();
+          renderViewOptions();
+          renderExhibitionList();
+        }
+      }
+
+      function route() {
+        const isStudio = location.hash.startsWith("#/studio");
+        document.getElementById("site").classList.toggle("hidden", isStudio);
+        document.getElementById("studio").classList.toggle("active", isStudio);
+        if (isStudio) renderAdmin();
+        else renderRoute();
+      }
+
+      document.getElementById("workFilters").addEventListener("click", (event) => {
+        if (!event.target.matches("button")) return;
+        activeWorkCategory = event.target.dataset.category;
+        if (currentRoute().detail) location.hash = "#works";
+        renderFilters();
+        renderWorks();
+      });
+
+      document.getElementById("workViewOptions").addEventListener("click", (event) => {
+        const button = event.target.closest("button");
+        if (!button) return;
+        activeWorkView = button.dataset.workView;
+        if (currentRoute().detail) location.hash = "#works";
+        renderViewOptions();
+        renderWorks();
+      });
+
+      document.getElementById("workGrid").addEventListener("click", (event) => {
+        const back = event.target.closest("[data-back-to='works']");
+        if (back) {
+          location.hash = "#works";
+          return;
+        }
+        const card = event.target.closest(".work-card, .work-row");
+        if (!card?.dataset.slug) return;
+        location.hash = `#works/${card.dataset.slug}`;
+      });
+
+      document.getElementById("workGrid").addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        const card = event.target.closest(".work-card, .work-row");
+        if (!card?.dataset.slug) return;
+        event.preventDefault();
+        location.hash = `#works/${card.dataset.slug}`;
+      });
+
+      document.getElementById("exhibitionFilters").addEventListener("click", (event) => {
+        if (!event.target.matches("button")) return;
+        activeExhibitionFilter = event.target.dataset.exhibitionFilter;
+        if (currentRoute().detail) location.hash = "#exhibitions";
+        renderExhibitionFilters();
+        renderExhibitionList();
+      });
+
+      document.getElementById("exhibitionViewOptions").addEventListener("click", (event) => {
+        const button = event.target.closest("button");
+        if (!button) return;
+        activeExhibitionView = button.dataset.exhibitionView;
+        if (currentRoute().detail) location.hash = "#exhibitions";
+        renderViewOptions();
+        renderExhibitionList();
+      });
+
+      document.getElementById("exhibitionList").addEventListener("click", (event) => {
+        const back = event.target.closest("[data-back-to='exhibitions']");
+        if (back) {
+          location.hash = "#exhibitions";
+          return;
+        }
+        const item = event.target.closest(".exhibition-item, .exhibition-row");
+        if (!item?.dataset.slug) return;
+        location.hash = `#exhibitions/${item.dataset.slug}`;
+      });
+
+      document.getElementById("exhibitionList").addEventListener("keydown", (event) => {
+        if (event.key !== "Enter" && event.key !== " ") return;
+        const item = event.target.closest(".exhibition-item, .exhibition-row");
+        if (!item?.dataset.slug) return;
+        event.preventDefault();
+        location.hash = `#exhibitions/${item.dataset.slug}`;
+      });
+
+      document.querySelectorAll("[data-admin-tab]").forEach((button) => {
+        button.addEventListener("click", () => {
+          adminTab = button.dataset.adminTab;
+          renderAdmin();
+        });
+      });
+
+      document.getElementById("searchToggle").addEventListener("click", () => {
+        const panel = document.getElementById("searchPanel");
+        if (panel.classList.contains("open")) closeSearch();
+        else openSearch();
+      });
+
+      document.getElementById("searchClose").addEventListener("click", closeSearch);
+
+      document.getElementById("searchInput").addEventListener("input", (event) => {
+        renderSearchResults(event.currentTarget.value);
+      });
+
+      document.getElementById("searchForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const firstResult = document.querySelector(".search-result");
+        if (firstResult) firstResult.click();
+      });
+
+      document.getElementById("searchResults").addEventListener("click", (event) => {
+        const result = event.target.closest(".search-result");
+        if (!result) return;
+        location.hash = result.dataset.slug ? `#${result.dataset.pageTarget}/${result.dataset.slug}` : `#${result.dataset.pageTarget}`;
+        closeSearch();
+      });
+
+      window.addEventListener("hashchange", route);
+      renderSite();
+      route();
+    </script>
+  </body>
+</html>
