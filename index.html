@@ -372,7 +372,8 @@
       }
 
       .view-icon rect,
-      .view-icon line {
+      .view-icon line,
+      .view-icon path {
         stroke: currentColor;
         stroke-width: 1.5;
         fill: none;
@@ -643,41 +644,104 @@
         display: none;
       }
 
-      .studio-shell {
+      .studio-login {
+        min-height: 100vh;
         display: grid;
-        grid-template-columns: 260px 1fr;
+        place-items: center;
+        padding: 28px;
+      }
+
+      .login-card {
+        width: min(100%, 420px);
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        padding: 26px 0 30px;
+      }
+
+      .login-card h1 {
+        margin-bottom: 22px;
+        font-size: 36px;
+      }
+
+      .login-error {
+        min-height: 20px;
+        margin: 0;
+        color: #9b1c1c;
+        font-size: 13px;
+      }
+
+      .studio-app {
         min-height: 100vh;
       }
 
-      .side {
+      .studio-login.hidden,
+      .studio-app.hidden,
+      .site-logout.hidden {
+        display: none;
+      }
+
+      .studio-top {
         position: sticky;
         top: 0;
-        height: 100vh;
-        border-right: 1px solid var(--line);
-        padding: 22px;
+        z-index: 5;
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 18px;
+        align-items: center;
+        padding: 18px 28px 0;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(12px);
+        border-bottom: 1px solid var(--line);
       }
 
-      .side h2 {
-        margin: 0 0 28px;
-        font-size: 18px;
-        font-weight: 560;
+      .studio-top h1 {
+        margin: 0;
+        font-size: 34px;
+        line-height: 1;
       }
 
-      .side button,
-      .side a {
-        display: block;
-        width: 100%;
-        margin: 0 0 6px;
+      .studio-actions {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+      }
+
+      .icon-btn {
         border: 0;
         background: transparent;
-        padding: 10px 0;
-        text-align: left;
+        padding: 4px;
+        cursor: pointer;
         color: #777;
-        text-decoration: none;
+      }
+
+      .icon-btn:hover {
+        color: var(--fg);
+      }
+
+      .studio-tabs {
+        grid-column: 1 / -1;
+        display: flex;
+        gap: 24px;
+        overflow-x: auto;
+        padding-top: 16px;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+      }
+
+      .studio-tabs::-webkit-scrollbar {
+        display: none;
+      }
+
+      .studio-tabs button {
+        flex: 0 0 auto;
+        border: 0;
+        background: transparent;
+        padding: 0 0 13px;
+        color: #777;
         cursor: pointer;
       }
 
-      .side .picked {
+      .studio-tabs .picked {
         color: var(--fg);
         font-weight: 560;
       }
@@ -730,7 +794,7 @@
 
       .editor {
         display: grid;
-        grid-template-columns: minmax(280px, 0.9fr) minmax(340px, 1.1fr);
+        grid-template-columns: minmax(260px, 0.82fr) minmax(360px, 1.18fr);
         gap: 28px;
         padding-top: 24px;
       }
@@ -738,33 +802,161 @@
       .records {
         border-right: 1px solid var(--line);
         padding-right: 28px;
+        display: grid;
+        align-content: start;
+        gap: 10px;
       }
 
       .record {
         width: 100%;
-        border: 0;
-        border-bottom: 1px solid var(--line);
+        border: 1px solid var(--line);
+        border-radius: 4px;
         background: #fff;
-        padding: 14px 0;
+        padding: 0;
+        text-align: left;
+        overflow: hidden;
+      }
+
+      .record.current {
+        border-color: var(--fg);
+      }
+
+      .record-main {
+        width: 100%;
+        border: 0;
+        background: transparent;
+        padding: 13px 14px 10px;
         text-align: left;
         cursor: pointer;
       }
 
-      .record strong {
+      .record-main strong {
         display: block;
         font-size: 16px;
         font-weight: 560;
       }
 
-      .record span {
+      .record-main span {
         display: block;
         margin-top: 3px;
         color: #777;
       }
 
-      .record.current strong {
-        text-decoration: underline;
-        text-underline-offset: 4px;
+      .record-meta {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 8px;
+      }
+
+      .status-pill {
+        display: inline-flex;
+        align-items: center;
+        min-height: 24px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 2px 8px;
+        color: #777;
+        font-size: 12px;
+      }
+
+      .status-pill.live {
+        color: var(--fg);
+        border-color: var(--fg);
+      }
+
+      .visibility-toggle {
+        width: 100%;
+        border: 0;
+        border-top: 1px solid var(--line);
+        background: #fafafa;
+        padding: 8px 14px;
+        text-align: left;
+        color: #555;
+        cursor: pointer;
+      }
+
+      .switch-row,
+      .check-row {
+        display: flex;
+        grid-template-columns: none;
+        gap: 9px;
+        align-items: center;
+        color: #333;
+        font-size: 14px;
+        font-weight: 520;
+      }
+
+      .switch-row input,
+      .check-row input {
+        width: auto;
+      }
+
+      .work-picker {
+        display: grid;
+        gap: 8px;
+        padding: 12px;
+        border: 1px solid var(--line);
+        border-radius: 4px;
+        max-height: 230px;
+        overflow: auto;
+      }
+
+      .linked-works {
+        margin-top: 30px;
+        padding-top: 22px;
+        border-top: 1px solid var(--line);
+      }
+
+      .linked-works h3 {
+        margin: 0 0 14px;
+        font-family: var(--display-font);
+        font-size: 20px;
+        font-weight: 520;
+      }
+
+      .linked-work-list {
+        display: grid;
+        gap: 0;
+      }
+
+      .linked-work {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 18px;
+        border: 0;
+        border-bottom: 1px solid var(--line);
+        background: transparent;
+        padding: 12px 0;
+        text-align: left;
+        cursor: pointer;
+      }
+
+      .linked-work strong {
+        font-family: var(--display-font);
+        font-size: 15px;
+        font-weight: 520;
+      }
+
+      .toast {
+        position: fixed;
+        right: 22px;
+        bottom: 22px;
+        z-index: 20;
+        max-width: min(320px, calc(100vw - 32px));
+        border: 1px solid var(--fg);
+        background: #fff;
+        padding: 10px 12px;
+        opacity: 0;
+        transform: translateY(8px);
+        pointer-events: none;
+        transition: opacity 180ms ease, transform 180ms ease;
+      }
+
+      .toast.show {
+        opacity: 1;
+        transform: translateY(0);
       }
 
       form {
@@ -891,8 +1083,7 @@
         .hero-inner,
         .list-item,
         .bio,
-        .editor,
-        .studio-shell {
+        .editor {
           grid-template-columns: 1fr;
         }
 
@@ -944,17 +1135,6 @@
           font-size: clamp(28px, 7vw, 42px);
         }
 
-        .studio-shell {
-          display: block;
-        }
-
-        .side {
-          position: static;
-          height: auto;
-          border-right: 0;
-          border-bottom: 1px solid var(--line);
-        }
-
         .records {
           border-right: 0;
           border-bottom: 1px solid var(--line);
@@ -968,6 +1148,15 @@
 
         .panel-head {
           display: grid;
+        }
+
+        .studio-top {
+          position: static;
+          padding: 18px 18px 0;
+        }
+
+        .studio-tabs {
+          gap: 18px;
         }
 
         .form-row {
@@ -1124,22 +1313,6 @@
           padding: 24px 0 58px;
         }
 
-        .side {
-          padding: 18px 16px;
-        }
-
-        .side h2 {
-          margin-bottom: 14px;
-        }
-
-        .side button,
-        .side a {
-          display: inline-block;
-          width: auto;
-          margin: 0 14px 0 0;
-          padding: 8px 0;
-        }
-
         .panel {
           padding: 20px 16px 56px;
         }
@@ -1148,8 +1321,27 @@
           font-size: 26px;
         }
 
+        .studio-login {
+          padding: 20px 16px;
+        }
+
+        .studio-top {
+          grid-template-columns: 1fr;
+          gap: 12px;
+          padding: 16px 16px 0;
+        }
+
+        .studio-actions {
+          justify-content: space-between;
+        }
+
         .editor {
           gap: 18px;
+        }
+
+        .linked-work {
+          grid-template-columns: 1fr;
+          gap: 4px;
         }
       }
 
@@ -1185,12 +1377,18 @@
           <div class="nav-center">
             <a href="#works" data-nav="works">Works</a>
             <a href="#exhibitions" data-nav="exhibitions">Exhibitions</a>
-            <a href="#activities" data-nav="activities">Activities</a>
             <a href="#biography" data-nav="biography">Biography</a>
           </div>
           <div class="nav-right">
             <button type="button" id="searchToggle">Search</button>
             <a href="#/studio">Studio</a>
+            <button class="icon-btn site-logout hidden" type="button" id="siteLogout" aria-label="Logout" title="Logout">
+              <svg class="view-icon" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M6 3H3v10h3"></path>
+                <path d="M9 5l3 3-3 3"></path>
+                <path d="M5 8h7"></path>
+              </svg>
+            </button>
           </div>
         </nav>
         <div class="search-panel" id="searchPanel" aria-hidden="true">
@@ -1277,24 +1475,6 @@
         </div>
       </section>
 
-      <section class="page" id="activities" data-page="activities">
-        <div class="frame page-title">
-          <h1>Activities</h1>
-        </div>
-        <div class="frame">
-          <div class="section-head">
-            <h2>Activities</h2>
-            <div class="filters">
-              <button class="selected" type="button">Recent</button>
-              <button type="button">Talks</button>
-              <button type="button">Publications</button>
-              <button type="button">Press</button>
-            </div>
-          </div>
-          <div class="list" id="activityList"></div>
-        </div>
-      </section>
-
       <section class="page" id="biography" data-page="biography">
         <div class="frame page-title">
           <h1>Biography</h1>
@@ -1317,15 +1497,35 @@
     </main>
 
     <main class="studio" id="studio">
-      <div class="studio-shell">
-        <aside class="side">
-          <h2>Back Office</h2>
-          <button class="picked" type="button" data-admin-tab="profile">Profile</button>
-          <button type="button" data-admin-tab="works">Works</button>
-          <button type="button" data-admin-tab="exhibitions">Exhibitions</button>
-          <button type="button" data-admin-tab="activities">Activities</button>
-          <a href="#home">View Site</a>
-        </aside>
+      <section class="studio-login" id="studioLogin">
+        <form class="login-card" id="studioLoginForm">
+          <h1>Studio</h1>
+          <label>ID<input name="id" autocomplete="username" required></label>
+          <label>Password<input name="password" type="password" autocomplete="current-password" required></label>
+          <p class="login-error" id="loginError"></p>
+          <button class="btn" type="submit">Enter Studio</button>
+          <a class="source-link" href="#home">Back to site</a>
+        </form>
+      </section>
+      <section class="studio-app hidden" id="studioApp">
+        <header class="studio-top">
+          <h1>Studio</h1>
+          <div class="studio-actions">
+            <a class="source-link" href="#home">View Site</a>
+            <button class="icon-btn" type="button" id="logoutStudio" aria-label="Logout" title="Logout">
+              <svg class="view-icon" viewBox="0 0 16 16" aria-hidden="true">
+                <path d="M6 3H3v10h3"></path>
+                <path d="M9 5l3 3-3 3"></path>
+                <path d="M5 8h7"></path>
+              </svg>
+            </button>
+          </div>
+          <nav class="studio-tabs" aria-label="Studio menu">
+            <button class="picked" type="button" data-admin-tab="profile">Profile</button>
+            <button type="button" data-admin-tab="works">Works</button>
+            <button type="button" data-admin-tab="exhibitions">Exhibitions</button>
+          </nav>
+        </header>
         <section class="panel">
           <div class="panel-head">
             <h1 id="panelTitle">Profile</h1>
@@ -1333,8 +1533,9 @@
           </div>
           <div id="adminPanel"></div>
         </section>
-      </div>
+      </section>
     </main>
+    <div class="toast" id="studioToast" role="status" aria-live="polite"></div>
 
     <template id="workCardTemplate">
       <article class="work-card">
@@ -1348,6 +1549,8 @@
 
     <script>
       const storeKey = "artist-homepage-content-v7";
+      const studioSessionKey = "artist-studio-session";
+      const studioCredentials = { id: "artist", password: "studio2026" };
       const emptyImage = "";
       const uid = () =>
         globalThis.crypto?.randomUUID?.() || `item-${Date.now()}-${Math.random().toString(16).slice(2)}`;
@@ -1456,6 +1659,22 @@
             "assets/oyoung/2023-08-ABucketOfTearsUntilItsBeautiful_Exhibition_09.jpg"
           ]
         }
+      };
+
+      const exhibitionWorkLinks = {
+        "KNOCK KNOCK": ["ATTIC NARRATIVES"],
+        "HER ATTIC": ["ATTIC NARRATIVES"],
+        "DESIRE BUT DO NOT DO, BECOME ILL": [
+          "WHAT’S WRONG?",
+          "CE N’EST PAS UN CITRON",
+          "YOUR EYES AND MINE UNDERLINE THE SAME SENTENCE",
+          "LYING ON THE GRASS"
+        ],
+        "A BUCKET OF TEARS UNTIL IT’S BEAUTIFUL": [
+          "A Bucket of Tears Until It’s Beautiful",
+          "The Mischievous Garden of a Lonely Being",
+          "Romantic Will"
+        ]
       };
 
       const initialData = {
@@ -1776,7 +1995,7 @@
 
       let data = loadData();
       let adminTab = "profile";
-      let selected = { works: data.works[0]?.id, exhibitions: data.exhibitions[0]?.id, activities: data.activities[0]?.id };
+      let selected = { works: data.works[0]?.id, exhibitions: data.exhibitions[0]?.id };
       let activeWorkCategory = "All";
       let activeExhibitionFilter = "All";
       let activeWorkView = "grid";
@@ -1796,23 +2015,51 @@
       function hydrateMediaData(content) {
         content.works = content.works.map((work) => {
           const images = workImageSets[work.title] || work.images || (work.image ? [work.image] : []);
-          return { ...work, image: work.image || images[0] || "", images };
+          return { ...work, visible: work.visible !== false, image: work.image || images[0] || "", images };
         });
         content.exhibitions = content.exhibitions.map((entry) => {
           const media = exhibitionImageSets[entry.title];
-          if (!media) return entry;
-          return { ...entry, poster: media.poster || entry.poster, images: media.images };
+          const linkedTitles = exhibitionWorkLinks[entry.title] || [];
+          const inferredWorkIds = linkedTitles
+            .map((title) => content.works.find((work) => work.title === title)?.id)
+            .filter(Boolean);
+          const next = {
+            ...entry,
+            visible: entry.visible !== false,
+            workIds: Array.isArray(entry.workIds) ? entry.workIds : inferredWorkIds
+          };
+          if (!media) return next;
+          return { ...next, poster: media.poster || entry.poster, images: media.images };
         });
         return content;
       }
 
-      function saveData() {
+      function publicWorks() {
+        return data.works.filter((work) => work.visible !== false);
+      }
+
+      function publicExhibitions() {
+        return data.exhibitions.filter((entry) => entry.visible !== false);
+      }
+
+      function saveData(message = "Saved and reflected on the site.") {
         try {
           localStorage.setItem(storeKey, JSON.stringify(data));
+          showFeedback(message);
         } catch {
           console.warn("Browser storage is unavailable; changes will last until the page is reloaded.");
+          showFeedback("Saved for this session only.");
         }
         renderSite();
+      }
+
+      function showFeedback(message) {
+        const toast = document.getElementById("studioToast");
+        if (!toast) return;
+        toast.textContent = message;
+        toast.classList.add("show");
+        clearTimeout(showFeedback.timer);
+        showFeedback.timer = setTimeout(() => toast.classList.remove("show"), 2200);
       }
 
       function text(value) {
@@ -1848,12 +2095,12 @@
         renderHomeCollage();
         renderWorks();
         renderExhibitionList();
-        renderEntryList("activityList", data.activities);
+        renderAuthControls();
         renderRoute();
       }
 
       function renderFilters() {
-        const categories = ["All", ...new Set(data.works.map((work) => work.category).filter(Boolean))];
+        const categories = ["All", ...new Set(publicWorks().map((work) => work.category).filter(Boolean))];
         if (!categories.includes(activeWorkCategory)) activeWorkCategory = "All";
         document.getElementById("workFilters").innerHTML = categories
           .map(
@@ -1881,7 +2128,7 @@
 
       function renderHomeCollage() {
         const target = document.getElementById("homeCollage");
-        const works = data.works.filter((work) => work.image);
+        const works = publicWorks().filter((work) => work.image);
         if (!target || !works.length) return;
         const random = seededRandom(homeCollageSeed);
         const clips = [
@@ -1932,15 +2179,15 @@
         const grid = document.getElementById("workGrid");
         const route = currentRoute();
         if (route.page === "works" && route.detail) {
-          const work = data.works.find((item) => itemSlug(item) === route.detail);
+          const work = publicWorks().find((item) => itemSlug(item) === route.detail);
           grid.className = "detail";
           grid.innerHTML = work ? renderWorkDetail(work) : `<div class="search-empty">Work not found.</div>`;
           return;
         }
         const works =
           activeWorkCategory === "All"
-            ? data.works
-            : data.works.filter((work) => work.category === activeWorkCategory);
+            ? publicWorks()
+            : publicWorks().filter((work) => work.category === activeWorkCategory);
         if (activeWorkView === "list") {
           grid.className = "index-list";
           grid.innerHTML =
@@ -2029,7 +2276,7 @@
         const target = document.getElementById("exhibitionList");
         const route = currentRoute();
         if (route.page === "exhibitions" && route.detail) {
-          const entry = data.exhibitions.find((item) => itemSlug(item) === route.detail);
+          const entry = publicExhibitions().find((item) => itemSlug(item) === route.detail);
           target.className = "detail";
           target.innerHTML = entry ? renderExhibitionDetail(entry) : `<div class="search-empty">Exhibition not found.</div>`;
           return;
@@ -2037,8 +2284,8 @@
         target.className = "list";
         const exhibitions =
           activeExhibitionFilter === "All"
-            ? data.exhibitions
-            : data.exhibitions.filter((entry) => text(entry.type).toLowerCase().includes(activeExhibitionFilter.toLowerCase()));
+            ? publicExhibitions()
+            : publicExhibitions().filter((entry) => text(entry.type).toLowerCase().includes(activeExhibitionFilter.toLowerCase()));
         if (activeExhibitionView === "list") {
           target.className = "index-list";
           target.innerHTML =
@@ -2101,33 +2348,50 @@
                       .join("")}</div>`
                   : ""
               }
+              ${renderLinkedWorks(entry)}
               ${entry.link ? `<a class="source-link" href="${escapeAttr(entry.link)}" target="_blank" rel="noreferrer">Original exhibition page</a>` : ""}
             </div>
           </article>
         `;
       }
 
+      function renderLinkedWorks(entry) {
+        const linked = publicWorks().filter((work) => entry.workIds?.includes(work.id));
+        if (!linked.length) return "";
+        return `
+          <div class="linked-works">
+            <h3>Included Works</h3>
+            <div class="linked-work-list">
+              ${linked
+                .map(
+                  (work) => `
+                    <button class="linked-work" type="button" data-work-slug="${escapeAttr(itemSlug(work))}">
+                      <strong>${escapeHtml(work.title)}</strong>
+                      <span class="muted">${escapeHtml([work.category, work.year].filter(Boolean).join(" · "))}</span>
+                    </button>
+                  `
+                )
+                .join("")}
+            </div>
+          </div>
+        `;
+      }
+
       function getSearchItems() {
         return [
-          ...data.works.map((work) => ({
+          ...publicWorks().map((work) => ({
             page: "works",
             slug: itemSlug(work),
             type: work.category || "Work",
             title: work.title,
             detail: [work.year, work.medium, work.dimensions, work.description].filter(Boolean).join(" · ")
           })),
-          ...data.exhibitions.map((entry) => ({
+          ...publicExhibitions().map((entry) => ({
             page: "exhibitions",
             slug: itemSlug(entry),
             type: entry.type || "Exhibition",
             title: entry.title,
             detail: [entry.date, entry.venue, entry.address, entry.description].filter(Boolean).join(" · ")
-          })),
-          ...data.activities.map((entry) => ({
-            page: "activities",
-            type: entry.type || "Activity",
-            title: entry.title,
-            detail: [entry.date, entry.venue, entry.description].filter(Boolean).join(" · ")
           })),
           {
             page: "biography",
@@ -2142,7 +2406,7 @@
         const target = document.getElementById("searchResults");
         const normalized = query.trim().toLowerCase();
         if (!normalized) {
-          target.innerHTML = `<div class="search-empty">Type to search works, exhibitions, activities, and biography.</div>`;
+          target.innerHTML = `<div class="search-empty">Type to search works, exhibitions, and biography.</div>`;
           return;
         }
         const results = getSearchItems().filter((item) =>
@@ -2179,6 +2443,11 @@
       }
 
       function renderAdmin() {
+        if (!isStudioLoggedIn()) {
+          renderStudioAccess();
+          return;
+        }
+        renderStudioAccess();
         document.getElementById("panelTitle").textContent = tabTitle(adminTab);
         document.querySelectorAll("[data-admin-tab]").forEach((button) => {
           button.classList.toggle("picked", button.dataset.adminTab === adminTab);
@@ -2186,11 +2455,25 @@
         if (adminTab === "profile") renderProfileAdmin();
         if (adminTab === "works") renderCollectionAdmin("works", blankWork);
         if (adminTab === "exhibitions") renderCollectionAdmin("exhibitions", blankEntry);
-        if (adminTab === "activities") renderCollectionAdmin("activities", blankEntry);
       }
 
       function tabTitle(tab) {
-        return { profile: "Profile", works: "Works", exhibitions: "Exhibitions", activities: "Activities" }[tab];
+        return { profile: "Profile", works: "Works", exhibitions: "Exhibitions" }[tab];
+      }
+
+      function isStudioLoggedIn() {
+        return sessionStorage.getItem(studioSessionKey) === "active";
+      }
+
+      function renderStudioAccess() {
+        const loggedIn = isStudioLoggedIn();
+        document.getElementById("studioLogin").classList.toggle("hidden", loggedIn);
+        document.getElementById("studioApp").classList.toggle("hidden", !loggedIn);
+        renderAuthControls();
+      }
+
+      function renderAuthControls() {
+        document.getElementById("siteLogout")?.classList.toggle("hidden", !isStudioLoggedIn());
       }
 
       function renderProfileAdmin() {
@@ -2212,14 +2495,14 @@
         document.getElementById("profileForm").addEventListener("submit", (event) => {
           event.preventDefault();
           data.profile = Object.fromEntries(new FormData(event.currentTarget));
-          saveData();
+          saveData("Profile saved and reflected.");
           renderAdmin();
         });
         document.getElementById("resetData").addEventListener("click", () => {
           if (!confirm("샘플 데이터로 되돌릴까요? 업로드한 이미지와 수정 내용이 사라집니다.")) return;
-          data = structuredClone(initialData);
-          selected = { works: data.works[0]?.id, exhibitions: data.exhibitions[0]?.id, activities: data.activities[0]?.id };
-          saveData();
+          data = hydrateMediaData(structuredClone(initialData));
+          selected = { works: data.works[0]?.id, exhibitions: data.exhibitions[0]?.id };
+          saveData("Sample content restored.");
           renderAdmin();
         });
       }
@@ -2240,10 +2523,19 @@
               ${items
                 .map(
                   (item) => `
-                    <button class="record ${item.id === selected[collection] ? "current" : ""}" type="button" data-id="${item.id}">
-                      <strong>${escapeHtml(item.title)}</strong>
-                      <span>${escapeHtml(item.date || item.year || item.type || "")}</span>
-                    </button>
+                    <article class="record ${item.id === selected[collection] ? "current" : ""}">
+                      <button class="record-main" type="button" data-id="${item.id}">
+                        <strong>${escapeHtml(item.title)}</strong>
+                        <span>${escapeHtml(item.date || item.year || item.type || "")}</span>
+                        <span class="record-meta">
+                          <span class="status-pill ${item.visible !== false ? "live" : ""}">${item.visible !== false ? "Visible" : "Hidden"}</span>
+                          <span>${collection === "exhibitions" ? `${item.workIds?.length || 0} works` : item.category || ""}</span>
+                        </span>
+                      </button>
+                      <button class="visibility-toggle" type="button" data-visibility-id="${item.id}" data-collection="${collection}">
+                        ${item.visible !== false ? "Hide from site" : "Show on site"}
+                      </button>
+                    </article>
                   `
                 )
                 .join("") || `<p class="note">아직 등록된 항목이 없습니다.</p>`}
@@ -2251,9 +2543,18 @@
             <div>${current ? renderForm(collection, current) : `<p class="note">New 버튼으로 첫 항목을 등록하세요.</p>`}</div>
           </div>
         `;
-        document.querySelectorAll(".record").forEach((button) => {
+        document.querySelectorAll(".record-main").forEach((button) => {
           button.addEventListener("click", () => {
             selected[collection] = button.dataset.id;
+            renderAdmin();
+          });
+        });
+        document.querySelectorAll("[data-visibility-id]").forEach((button) => {
+          button.addEventListener("click", () => {
+            const item = data[button.dataset.collection].find((entry) => entry.id === button.dataset.visibilityId);
+            if (!item) return;
+            item.visible = item.visible === false;
+            saveData(item.visible ? "Item is now visible on the site." : "Item is now hidden from the site.");
             renderAdmin();
           });
         });
@@ -2261,24 +2562,27 @@
           const item = blankFactory();
           data[collection].unshift(item);
           selected[collection] = item.id;
-          saveData();
+          saveData(`${tabTitle(collection)} item created.`);
           renderAdmin();
         });
         document.getElementById("deleteRecord").addEventListener("click", () => {
           if (!current || !confirm("이 항목을 삭제할까요?")) return;
           data[collection] = data[collection].filter((item) => item.id !== current.id);
           selected[collection] = data[collection][0]?.id;
-          saveData();
+          saveData(`${tabTitle(collection)} item deleted.`);
           renderAdmin();
         });
         const form = document.getElementById("recordForm");
         if (form) {
           form.addEventListener("submit", (event) => {
             event.preventDefault();
-            const values = Object.fromEntries(new FormData(event.currentTarget));
+            const formData = new FormData(event.currentTarget);
+            const values = Object.fromEntries(formData);
+            values.visible = formData.get("visible") === "on";
+            if (collection === "exhibitions") values.workIds = formData.getAll("workIds");
             const index = data[collection].findIndex((item) => item.id === current.id);
             data[collection][index] = { ...current, ...values };
-            saveData();
+            saveData(`${tabTitle(collection)} item saved and reflected.`);
             renderAdmin();
           });
           const imageInput = document.getElementById("imageInput");
@@ -2289,14 +2593,26 @@
               const image = await fileToDataUrl(file);
               const index = data[collection].findIndex((item) => item.id === current.id);
               data[collection][index] = { ...current, image };
-              saveData();
+              saveData("Image uploaded and reflected.");
               renderAdmin();
             });
             const clear = document.getElementById("clearImage");
             clear.addEventListener("click", () => {
               const index = data[collection].findIndex((item) => item.id === current.id);
               data[collection][index] = { ...current, image: "" };
-              saveData();
+              saveData("Image removed.");
+              renderAdmin();
+            });
+          }
+          const posterInput = document.getElementById("posterInput");
+          if (posterInput) {
+            posterInput.addEventListener("change", async (event) => {
+              const file = event.target.files[0];
+              if (!file) return;
+              const poster = await fileToDataUrl(file);
+              const index = data[collection].findIndex((item) => item.id === current.id);
+              data[collection][index] = { ...current, poster };
+              saveData("Poster uploaded and reflected.");
               renderAdmin();
             });
           }
@@ -2310,6 +2626,7 @@
               <div class="preview">${item.image ? `<img src="${item.image}" alt="">` : `<span class="note">No image uploaded</span>`}</div>
               <label>Artwork image<input id="imageInput" type="file" accept="image/*"></label>
               <button class="btn secondary" type="button" id="clearImage">Remove Image</button>
+              <label class="switch-row"><input name="visible" type="checkbox" ${item.visible !== false ? "checked" : ""}> Visible on site</label>
               <label>Title<input name="title" value="${escapeAttr(item.title)}" required></label>
               <div class="form-row">
                 <label>Year<input name="year" value="${escapeAttr(item.year)}"></label>
@@ -2324,14 +2641,32 @@
         }
         return `
           <form id="recordForm">
+            <div class="preview">${item.poster ? `<img src="${item.poster}" alt="">` : `<span class="note">No poster uploaded</span>`}</div>
+            <label>Exhibition poster<input id="posterInput" type="file" accept="image/*"></label>
+            <label class="switch-row"><input name="visible" type="checkbox" ${item.visible !== false ? "checked" : ""}> Visible on site</label>
             <label>Title<input name="title" value="${escapeAttr(item.title)}" required></label>
             <div class="form-row">
               <label>Type<input name="type" value="${escapeAttr(item.type)}"></label>
               <label>Date<input name="date" value="${escapeAttr(item.date)}"></label>
             </div>
             <label>Venue / publisher<input name="venue" value="${escapeAttr(item.venue)}"></label>
+            <label>Address<input name="address" value="${escapeAttr(item.address || "")}"></label>
             <label>Description<textarea name="description">${escapeHtml(item.description)}</textarea></label>
-            <button class="btn" type="submit">Save ${collection === "exhibitions" ? "Exhibition" : "Activity"}</button>
+            <label>Linked works
+              <div class="work-picker">
+                ${data.works
+                  .map(
+                    (work) => `
+                      <label class="check-row">
+                        <input name="workIds" type="checkbox" value="${escapeAttr(work.id)}" ${item.workIds?.includes(work.id) ? "checked" : ""}>
+                        ${escapeHtml(work.title)}
+                      </label>
+                    `
+                  )
+                  .join("") || `<span class="note">No works registered.</span>`}
+              </div>
+            </label>
+            <button class="btn" type="submit">Save Exhibition</button>
           </form>
         `;
       }
@@ -2345,7 +2680,8 @@
           medium: "",
           dimensions: "",
           description: "",
-          image: ""
+          image: "",
+          visible: true
         };
       }
 
@@ -2356,7 +2692,12 @@
           type: "",
           date: "",
           venue: "",
-          description: ""
+          address: "",
+          description: "",
+          poster: "",
+          images: [],
+          workIds: [],
+          visible: true
         };
       }
 
@@ -2389,7 +2730,7 @@
       function currentRoute() {
         const clean = location.hash.replace(/^#\/?/, "") || "home";
         const [page, detail] = clean.split("/");
-        const safePage = ["home", "works", "exhibitions", "activities", "biography"].includes(page) ? page : "home";
+        const safePage = ["home", "works", "exhibitions", "biography"].includes(page) ? page : "home";
         return { page: safePage, detail: detail || "" };
       }
 
@@ -2487,6 +2828,11 @@
           location.hash = "#exhibitions";
           return;
         }
+        const linked = event.target.closest(".linked-work");
+        if (linked?.dataset.workSlug) {
+          location.hash = `#works/${linked.dataset.workSlug}`;
+          return;
+        }
         const item = event.target.closest(".exhibition-item, .exhibition-row");
         if (!item?.dataset.slug) return;
         location.hash = `#exhibitions/${item.dataset.slug}`;
@@ -2505,6 +2851,32 @@
           adminTab = button.dataset.adminTab;
           renderAdmin();
         });
+      });
+
+      document.getElementById("studioLoginForm").addEventListener("submit", (event) => {
+        event.preventDefault();
+        const values = Object.fromEntries(new FormData(event.currentTarget));
+        if (values.id !== studioCredentials.id || values.password !== studioCredentials.password) {
+          document.getElementById("loginError").textContent = "ID 또는 암호가 올바르지 않습니다.";
+          return;
+        }
+        sessionStorage.setItem(studioSessionKey, "active");
+        event.currentTarget.reset();
+        document.getElementById("loginError").textContent = "";
+        renderAdmin();
+        showFeedback("Studio unlocked.");
+      });
+
+      document.getElementById("logoutStudio").addEventListener("click", () => {
+        sessionStorage.removeItem(studioSessionKey);
+        renderAdmin();
+        showFeedback("Logged out.");
+      });
+
+      document.getElementById("siteLogout").addEventListener("click", () => {
+        sessionStorage.removeItem(studioSessionKey);
+        renderAuthControls();
+        showFeedback("Logged out.");
       });
 
       document.getElementById("searchToggle").addEventListener("click", () => {
