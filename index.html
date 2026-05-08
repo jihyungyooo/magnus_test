@@ -236,9 +236,7 @@
       }
 
       .section-head {
-        display: grid;
-        grid-template-columns: minmax(170px, 0.35fr) 1fr;
-        gap: 28px;
+        display: block;
         align-items: baseline;
         padding: 24px 0 14px;
         border-bottom: 1px solid var(--line);
@@ -339,23 +337,31 @@
 
       .index-row {
         display: grid;
-        grid-template-columns: 1.2fr 0.8fr 0.8fr 0.8fr;
         gap: 24px;
         padding: 14px 0;
         border-bottom: 1px solid var(--line);
         cursor: pointer;
       }
 
+      .work-row {
+        grid-template-columns: minmax(260px, 1.35fr) minmax(180px, 0.95fr) minmax(170px, 0.8fr) minmax(110px, 0.45fr) minmax(70px, 0.28fr);
+      }
+
+      .exhibition-row {
+        grid-template-columns: minmax(260px, 1.25fr) minmax(190px, 0.75fr) minmax(260px, 1fr) minmax(120px, 0.45fr);
+      }
+
       .index-row strong {
         font-family: var(--display-font);
-        font-size: 18px;
+        font-size: 15px;
         font-weight: 520;
-        line-height: 1.16;
+        line-height: 1.22;
       }
 
       .index-row span {
         color: #333;
-        font-size: 14px;
+        font-size: 15px;
+        line-height: 1.22;
       }
 
       .index-row .muted {
@@ -833,6 +839,11 @@
           gap: 6px;
         }
 
+        .work-row,
+        .exhibition-row {
+          grid-template-columns: 1fr;
+        }
+
         .exhibition-item {
           grid-template-columns: 1fr;
         }
@@ -923,7 +934,6 @@
         </div>
         <div class="frame">
           <div class="section-head">
-            <h2>Works</h2>
             <div class="section-tools">
               <div class="filters" id="workFilters"></div>
               <div class="view-options" id="workViewOptions">
@@ -955,7 +965,6 @@
         </div>
         <div class="frame">
           <div class="section-head">
-            <h2>Exhibitions</h2>
             <div class="section-tools">
               <div class="filters" id="exhibitionFilters">
                 <button class="selected" type="button" data-exhibition-filter="All">All</button>
@@ -1610,7 +1619,8 @@
                     <strong>${escapeHtml(work.title)}</strong>
                     <span>${escapeHtml(work.medium)}</span>
                     <span>${escapeHtml(work.dimensions)}</span>
-                    <span class="muted">${escapeHtml([work.category, work.year].filter(Boolean).join(" · "))}</span>
+                    <span class="muted">${escapeHtml(work.category)}</span>
+                    <span class="muted">${escapeHtml(work.year)}</span>
                   </article>
                 `
               )
